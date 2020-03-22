@@ -12,7 +12,9 @@ def home(req):
     url = "https://www.mohfw.gov.in/"
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
-    tab = soup.find_all('tr')
+    
+    tables = soup.find_all('tbody')
+    tab = tables[1].find_all('tr')[:-1]
 
     data = {
         'state' : list(),
@@ -22,7 +24,7 @@ def home(req):
         'death' : list()
     }
 
-    for row in tab[1:-1]:
+    for row in tab[:-1]:
         lst = row.find_all('td')
         data['state'].append(remove_html_tags(lst[1]))
         data['indian'].append(int(remove_html_tags(lst[2])))
