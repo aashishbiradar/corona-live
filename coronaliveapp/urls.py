@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('ping/', views.ping),
     path('', views.home),
+    path('adarsh/', views.adarsh_home)
 ]
