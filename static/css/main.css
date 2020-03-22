@@ -1,11 +1,19 @@
+.hidden{
+    display: none;
+}
+body{
+    margin: 0;
+    padding: 0;
+}
+
 .highcharts-figure, .highcharts-data-table table {
     min-width: 310px; 
-    max-width: 800px;
+    max-width: 90vw;
     margin: 1em auto;
 }
 
 #container {
-    height: 1000px;
+    height: 95vh;
 }
 
 .highcharts-data-table table {
@@ -38,4 +46,16 @@
 
 text.highcharts-credits {
     display: none;
+}
+
+@media only screen and (min-width: 600px) {
+    .twitter-cont{
+        background: #3498db;
+        padding: 1em;
+    }
+}
+
+.twitter-box{
+    max-width: 550px;
+    margin: auto;
 }

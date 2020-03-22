@@ -4,7 +4,7 @@ if (typeof data != 'undefined' && data) {
             type: 'bar'
         },
         title: {
-            text: 'Statewise Stats'
+            text: 'Statewise Corona Cases'
         },
         xAxis: {
             categories: data.state
