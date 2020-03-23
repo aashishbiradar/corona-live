@@ -1,5 +1,6 @@
 
 import requests, json
+import pandas as pd
 import urllib.request
 import time
 from bs4 import BeautifulSoup
@@ -14,25 +15,35 @@ def home(req):
     soup = BeautifulSoup(response.text, "html.parser")
     
     tables = soup.find_all('tbody')
-    tab = tables[1].find_all('tr')[:-1]
+    tab=soup.find_all('tr')
 
-    data = {
-        'state' : list(),
-        'indian' : list(),
-        'foreign' : list(),
-        'discharged' : list(),
-        'death' : list()
-    }
+    state=list()
+    indian=list()
+    foreign=list()
+    discharged=list()
+    death=list()
 
-    for row in tab[:-1]:
-        lst = row.find_all('td')
-        data['state'].append(remove_html_tags(lst[1]))
-        data['indian'].append(int(remove_html_tags(lst[2])))
-        data['foreign'].append(int(remove_html_tags(lst[3])))
-        data['discharged'].append(int(remove_html_tags(lst[4])))
-        data['death'].append(int(remove_html_tags(lst[5])))
-    print(json.dumps(data))
-    return render(req,'home.html',{'data': mark_safe(json.dumps(data))})
+    for row in tab:
+        lst=row.find_all('td')
+        if(len(lst)==6):
+            try:
+                state.append((remove_html_tags(lst[1])))
+                indian.append(get_count(remove_html_tags(lst[2])))
+                foreign.append(get_count(remove_html_tags(lst[3])))
+                discharged.append(get_count(remove_html_tags(lst[4])))
+                death.append(get_count(remove_html_tags(lst[5])))
+            except:
+                pass
+
+    data=pd.DataFrame(list(zip(state,indian,foreign,discharged,death)),columns=['state','indian','foreign','discharged','death'])
+    data['total']=data['indian']+data['foreign']+data['discharged']+data['death']
+    data.sort_values(by='total',axis=0,ascending=False,inplace=True)
+    statewise = data.to_dict()
+    for ke in statewise:
+        statewise[ke]=list(statewise[ke].values())
+
+    print(json.dumps(statewise))
+    return render(req,'home.html',{'data': mark_safe(json.dumps(statewise))})
     #return JsonResponse(data)
     #return HttpResponse(response.text)
 
@@ -58,34 +69,32 @@ def adarsh_home(req):
     soup = BeautifulSoup(response.text, "html.parser")
     
     tables = soup.find_all('tbody')
-    tab = tables[1].find_all('tr')[:-1]
+    tab=soup.find_all('tr')
 
-    data = {
-        'state' : list(),
-        'indian' : list(),
-        'foreign' : list(),
-        'discharged' : list(),
-        'death' : list()
-    }
+    state=list()
+    indian=list()
+    foreign=list()
+    discharged=list()
+    death=list()
 
     for row in tab:
-    lst=row.find_all('td')
-    if(len(lst)==6):
-        try:
-            state.append((remove_html_tags(lst[1])))
-            indian.append(get_count(remove_html_tags(lst[2])))
-            foreign.append(get_count(remove_html_tags(lst[3])))
-            discharged.append(get_count(remove_html_tags(lst[4])))
-            death.append(get_count(remove_html_tags(lst[5])))
-        except:
-            pass
-    else:
-        pass
+        lst=row.find_all('td')
+        if(len(lst)==6):
+            try:
+                state.append((remove_html_tags(lst[1])))
+                indian.append(get_count(remove_html_tags(lst[2])))
+                foreign.append(get_count(remove_html_tags(lst[3])))
+                discharged.append(get_count(remove_html_tags(lst[4])))
+                death.append(get_count(remove_html_tags(lst[5])))
+            except:
+                pass
 
-    data=pd.DataFrame(list(zip(indian,foreign,discharged,death)),columns=['Indian','Foregin','Discharged','Death'],index=state)
-    data['total']=data['Indian']+data['Foregin']+data['Discharged']+data['Death']
+    data=pd.DataFrame(list(zip(state,indian,foreign,discharged,death)),columns=['state','indian','foreign','discharged','death'])
+    data['total']=data['indian']+data['foreign']+data['discharged']+data['death']
     data.sort_values(by='total',axis=0,ascending=False,inplace=True)
     statewise = data.to_dict()
+    for ke in statewise:
+        statewise[ke]=list(statewise[ke].values())
     """
     counts=soup.findAll("span", {"class": "icount"})
     label=soup.findAll("div", {"class": "info_label"})
@@ -95,8 +104,6 @@ def adarsh_home(req):
     for i in range(len(counts)):
         info[remove_html_tags(label[i])].append(get_count(remove_html_tags(counts[i])))
     """
-
-    print(json.dumps(data))
     return render(req,'home.html',{'data': mark_safe(json.dumps(statewise))})
     #return JsonResponse(data)
     #return HttpResponse(response.text)
