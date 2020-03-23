@@ -97,6 +97,6 @@ def adarsh_home(req):
     """
 
     print(json.dumps(data))
-    return render(req,'home.html',{'data': mark_safe(json.dumps(data))})
+    return render(req,'home.html',{'data': mark_safe(json.dumps(statewise))})
     #return JsonResponse(data)
     #return HttpResponse(response.text)
