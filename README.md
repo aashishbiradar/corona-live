@@ -1,2 +1,2 @@
 # corona-live
-Coronavirus Live Updates
+Coronavirus in India Live Updates
