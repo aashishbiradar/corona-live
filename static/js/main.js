@@ -33,12 +33,17 @@ if(true)
         },
         series: [{
             type: 'pie',
-            name: 'Browser share',
+            name: 'share',
             data: [
                 ['Active Cases',(parseInt(info.total)-parseInt(info.death)-parseInt(info.cured)-parseInt(info.migrated))],
-                ['Cured', parseFloat(info.cured)],
-                ['Migrated',info.migrated],
-                ['Died', info.death]
+                {
+                    name: 'Cured',
+                    y: parseInt(info.cured),
+                    sliced: true,
+                    selected: true
+                },
+                ['Migrated',parseInt(info.migrated)],
+                ['Died', parseInt(info.death)]
             ]
         }]
     });
