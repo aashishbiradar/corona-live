@@ -5,7 +5,20 @@ body{
     margin: 0;
     padding: 0;
 }
-
+.maindiv {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+.piediv {
+    height: 100%; 
+    width:50%;
+}
+.linediv {
+    height: 100%; 
+    width:50%;
+}
 .highcharts-figure, .highcharts-data-table table {
     min-width: 310px; 
     max-width: 90vw;
