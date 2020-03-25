@@ -1,5 +1,56 @@
 if(true)
 {
+    Highcharts.chart('linecontainer', {
+        chart: {
+            type: 'areaspline'
+        },
+        title: {
+            text: 'Corona Cases'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'left',
+            verticalAlign: 'top',
+            x: 150,
+            y: 100,
+            floating: true,
+            borderWidth: 1,
+            backgroundColor:
+                Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
+        },
+        xAxis: {
+            categories: days.date,
+            plotBands: [{ // visualize the weekend
+                from: 4.5,
+                to: 6.5,
+                color: 'rgba(68, 170, 213, .2)'
+            }]
+        },
+        yAxis: {
+            title: {
+                text: 'Total Infected'
+            }
+        },
+        tooltip: {
+            shared: true,
+            valueSuffix: ' cases'
+        },
+        credits: {
+            enabled: false
+        },
+        plotOptions: {
+            areaspline: {
+                fillOpacity: 0.5
+            }
+        },
+        series: [{
+            name: 'Infected',
+            data: days.total
+        }]
+    });
+}
+if(true)
+{
     Highcharts.chart('piecontainer', {
         chart: {
             type: 'pie',

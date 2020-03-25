@@ -40,15 +40,40 @@ def home(req):
     data.sort_values(by='total',axis=0,ascending=False,inplace=True)
     statewise = data.to_dict()
     info=dict()
+
     for ke in statewise:
         statewise[ke]=list(statewise[ke].values())
+
     counts=soup.findAll("span", {"class": "icount"})
     label=soup.findAll("div", {"class": "info_label"})
     info_labels=['passengers','total','cured','death','migrated']
     info_counts=[remove_html_tags(x) for x in counts]
     info=dict(zip(info_labels,info_counts))
-    print(json.dumps(statewise))
-    return render(req,'home.html',{'data': mark_safe(json.dumps(statewise)),'info':mark_safe(json.dumps(info)),'info2':json.dumps(info)})
+    
+    wiki_url="https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_India"
+    wiki_response=requests.get(wiki_url)
+
+    wiki = BeautifulSoup(wiki_response.text, "html.parser")
+
+    counts=wiki.findAll("span", {"style":"width:2.45em; padding:0 0.3em 0 0; text-align:right; display:inline-block"})
+    dates=wiki.findAll("td",{"colspan":"2","style":"padding-left:0.4em; padding-right:0.4em; text-align:center"})
+
+    counts=[get_count(remove_html_tags(x)) for x in counts]
+    dates=[remove_html_tags(x) for x in dates]
+
+    daily=dict(zip(dates,counts))
+
+    del daily['⋮']
+    del daily['2020-01-30']
+    del daily['2020-02-02']
+    del daily['2020-02-03']
+    daily['2020-03-01']=3
+    daily['2020-03-11']=65
+    days=dict()
+    days["date"]=sorted(daily)
+    days["total"]=sorted(daily.values())
+
+    return render(req,'home.html',{'data': mark_safe(json.dumps(statewise)),'info':mark_safe(json.dumps(info)),'days':mark_safe(json.dumps(days))})
     #return JsonResponse(data)
     #return HttpResponse(response.text)
 
