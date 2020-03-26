@@ -1,0 +1,46 @@
+.hidden{
+    display: none;
+}
+body{
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+.main {
+    max-width: 1300px;
+    margin: 0 auto;   
+}
+figure{
+    margin: 0;
+}
+.section-1 {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.linediv { 
+    flex-grow: 100;
+}
+.piediv { 
+    width: 300px;
+}
+#container {
+    height: 100vh;
+}
+text.highcharts-credits {
+    display: none;
+}
+footer{
+    background-color: #3498db;
+    text-align: center;
+    padding: 10px;
+    color: #fff;
+}
+@media only screen and (max-width: 600px) {
+    .section-1 {
+        flex-direction: column;
+    }
+    .linediv { 
+        width: 100%;
+    }
+}
