@@ -4,6 +4,7 @@
 body{
     margin: 0;
     padding: 0;
+    user-select: none;
 }
 .main {
     max-width: 1300px;
@@ -29,15 +30,17 @@ figure{
 text.highcharts-credits {
     display: none;
 }
-
-@media only screen and (min-width: 600px) {
-    .twitter-cont{
-        background: #3498db;
-        padding: 1em;
-    }
+footer{
+    background-color: #3498db;
+    text-align: center;
+    padding: 10px;
+    color: #fff;
 }
-
-.twitter-box{
-    max-width: 550px;
-    margin: auto;
+@media only screen and (max-width: 600px) {
+    .section-1 {
+        flex-direction: column;
+    }
+    .linediv { 
+        width: 100%;
+    }
 }

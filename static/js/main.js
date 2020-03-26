@@ -4,6 +4,8 @@ Highcharts.chart('linecontainer', {
     },
     title: {
         text: 'Corona India Timeline',
+        x:0,
+        y:70,
         style: {
             color: '#333333',
             fontWeight: 'bold',

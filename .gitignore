@@ -170,3 +170,4 @@ dmypy.json
 
 .vscode
 static/admin
+coronaliveapp/config.py

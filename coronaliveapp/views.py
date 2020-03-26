@@ -1,20 +1,21 @@
 
-import requests, json
+import requests, json, re, urllib.request, time
+
 import pandas as pd
-import urllib.request
-import time
 from bs4 import BeautifulSoup
-import re
+
 from django.http import HttpResponse, JsonResponse
 from django.utils.safestring import mark_safe
 from django.shortcuts import render
 
+from corona.models import Cache
+
 def home(req):
+    t1 = time.time()
     url = "https://www.mohfw.gov.in/"
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
     
-    tables = soup.find_all('tbody')
     tab=soup.find_all('tr')
 
     state=list()
@@ -45,7 +46,6 @@ def home(req):
         statewise[ke]=list(statewise[ke].values())
 
     counts=soup.findAll("span", {"class": "icount"})
-    label=soup.findAll("div", {"class": "info_label"})
     info_labels=['passengers','total','cured','death','migrated']
     info_counts=[remove_html_tags(x) for x in counts]
     info=dict(zip(info_labels,info_counts))
@@ -73,7 +73,9 @@ def home(req):
     days["date"]=sorted(daily)
     days["total"]=sorted(daily.values())
 
-    return render(req,'home.html',{'data': mark_safe(json.dumps(statewise)),'info':mark_safe(json.dumps(info)),'days':mark_safe(json.dumps(days))})
+    t2 = time.time()
+    compute = t2-t1
+    return render(req,'home.html',{'data': mark_safe(json.dumps(statewise)),'info':mark_safe(json.dumps(info)),'days':mark_safe(json.dumps(days)), 'compute' : compute})
     #return JsonResponse(data)
     #return HttpResponse(response.text)
 
@@ -92,3 +94,13 @@ def get_count(text):
 
 def ping(req):
     return HttpResponse('<h1>pong</h1>')
+
+def create(req):
+    key = 'key-'+str(time.time())
+    dict = {
+        'data1': time.time(),
+        'data2': "SOME TEXT"
+    }
+    cache = Cache(cache_key = key, data = json.dumps(dict))
+    cache.save()
+    return HttpResponse(f'<h1>{key}</h1>')
