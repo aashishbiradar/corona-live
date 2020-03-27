@@ -10,20 +10,22 @@ from django.shortcuts import render
 
 from corona.models import Cache
 
-def home(req):
-    t1 = time.time()
+
+
+def get_mohfw():
     url = "https://www.mohfw.gov.in/"
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
-    
-    tab=soup.find_all('tr')
+    return soup
 
+
+def get_statewise(soup):
+    tab=soup.find_all('tr')
     state=list()
     indian=list()
     foreign=list()
     discharged=list()
     death=list()
-
     for row in tab:
         lst=row.find_all('td')
         if(len(lst)==6):
@@ -45,16 +47,22 @@ def home(req):
     for ke in statewise:
         statewise[ke]=list(statewise[ke].values())
 
+    return statewise
+
+def get_info(soup):
     counts=soup.findAll("span", {"class": "icount"})
-    info_labels=['passengers','total','cured','death','migrated']
+    info_labels=['passengers','infected','cured','death','migrated']
     info_counts=[remove_html_tags(x) for x in counts]
     info=dict(zip(info_labels,info_counts))
-    
+    return info
+
+def get_wiki():
     wiki_url="https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_India"
     wiki_response=requests.get(wiki_url)
-
     wiki = BeautifulSoup(wiki_response.text, "html.parser")
+    return wiki
 
+def get_daily(wiki):
     counts=wiki.findAll("span", {"style":"width:2.45em; padding:0 0.3em 0 0; text-align:right; display:inline-block"})
     dates=wiki.findAll("td",{"colspan":"2","style":"padding-left:0.4em; padding-right:0.4em; text-align:center"})
 
@@ -71,11 +79,46 @@ def home(req):
     daily['2020-03-11']=65
     days=dict()
     days["date"]=sorted(daily)
-    days["total"]=sorted(daily.values())
+    days["infected"]=sorted(daily.values())
+
+    return days
+
+def get_tests(wiki):
+    table=wiki.find("table",{"class":"wikitable plainrowheaders"})
+    rows=table.find_all('td')
+
+    tests={
+        "perm":rows[1].text.replace('\n', ''),
+        "inds":rows[2].text.replace('\n', '').replace(",","")
+    }
+
+    return tests
+
+
+
+def home(req):
+    t1 = time.time()
+    
+    soup=get_mohfw()
+    statewise=get_statewise(soup)
+    info=get_info(soup)
+    wiki=get_wiki()
+    days=get_daily(wiki)
+    tests=get_tests(wiki)
+
+
+    total={
+        "statewise" : statewise,
+        "info" : info,
+        "days" : days,
+        "tests":tests
+    }
+
 
     t2 = time.time()
     compute = t2-t1
-    return render(req,'home.html',{'data': mark_safe(json.dumps(statewise)),'info':mark_safe(json.dumps(info)),'days':mark_safe(json.dumps(days)), 'compute' : compute})
+    return render(req,"home.html",{'total':mark_safe(json.dumps(total))})
+    #return render(req,'home.html',{'data': mark_safe(json.dumps(statewise)),'info':mark_safe(json.dumps(info)),'days':mark_safe(json.dumps(days)), 'compute' : compute})
     #return JsonResponse(data)
     #return HttpResponse(response.text)
 

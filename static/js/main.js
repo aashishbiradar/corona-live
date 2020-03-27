@@ -24,7 +24,7 @@ Highcharts.chart('linecontainer', {
             Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
     },
     xAxis: {
-        categories: days.date,
+        categories: total.days.date,
         plotBands: [{
             from: 4.5,
             to: 6.5,
@@ -50,18 +50,18 @@ Highcharts.chart('linecontainer', {
     },
     series: [{
         name: 'Infected',
-        data: days.total
+        data: total.days.infected
     }]
 });
 
-var total = (parseInt(info.total)+parseInt(info.cured)+parseInt(info.migrated)+parseInt(info.death));
+var infectedTotal = (parseInt(total.info.infected)+parseInt(total.info.cured)+parseInt(total.info.migrated)+parseInt(total.info.death));
 Highcharts.chart('piecontainer', {
     chart: {
         type: 'pie',
         height: 270
     },
     title: {
-        text: total+' cases',
+        text: infectedTotal+' cases',
         verticalAlign: 'middle',
         floating:true,
         x: 0,
@@ -88,24 +88,24 @@ Highcharts.chart('piecontainer', {
         data: [
             {
                 name: 'Active',
-                y: parseInt(info.total),
+                y: parseInt(total.info.infected),
                 color: '#3498db '
             },
             {
                 name: 'Recovered',
-                y: parseInt(info.cured),
+                y: parseInt(total.info.cured),
                 sliced: true,
                 selected: true,
                 color: '#2ecc71'
             },
             {
                 name: 'Migrated',
-                y: parseInt(info.migrated),
+                y: parseInt(total.info.migrated),
                 color: '#9b59b6'
             },
             {
                 name: 'Death',
-                y: parseInt(info.death),
+                y: parseInt(total.info.death),
                 color: '#34495e'
             }
         ]
@@ -125,7 +125,7 @@ Highcharts.chart('container', {
         }
     },
     xAxis: {
-        categories: data.state
+        categories: total.statewise.state
     },
     yAxis: {
         min: 0,
@@ -144,19 +144,19 @@ Highcharts.chart('container', {
     },
     series: [{
         name: 'Indian',
-        data: data.indian,
+        data: total.statewise.indian,
         color: '#3498db'
     }, {
         name: 'Foreign Nationals',
-        data: data.foreign,
+        data: total.statewise.foreign,
         color: '#9b59b6'
     }, {
         name: 'Recovered',
-        data: data.discharged,
+        data: total.statewise.discharged,
         color: '#2ecc71'
     }, {
         name: 'Death',
-        data: data.death,
+        data: total.statewise.death,
         color: '#34495e'
     }]
 });
