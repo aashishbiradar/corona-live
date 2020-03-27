@@ -21,12 +21,12 @@ def home(req):
     from_cache= 'true'
 
     if not cached_data:
-
+        #try:
         soup=get_mohfw()
         statewise=get_statewise(soup)
         info=get_info(soup)
         wiki=get_wiki()
-        days=get_daily(wiki)
+        days=get_daily(wiki,int(info['confirmed']))
         tests=get_tests(wiki)
 
         cached_data = {
@@ -39,6 +39,47 @@ def home(req):
 
         save_cache(cache_key, cached_data)
         from_cache= 'false'
+        #except:
+        #    cached_data = get_cache(cache_key)
+
+        
+    t2 = time.time()
+    compute = t2-t1
+    return render(req,'home.html',{
+        'data': mark_safe(json.dumps(cached_data)),
+        'compute': compute,
+        'from_cache': from_cache,
+        'dict': cached_data
+    })
+
+
+#route functions
+def adarsh(req):
+    t1 = time.time()
+    cache_key = 'homepage'
+    expiry = 5 
+    cached_data = get_cache(cache_key, expiry)
+    from_cache= 'true'
+
+    if True or not cached_data:
+        soup=get_mohfw()
+        statewise=get_statewise(soup)
+        info=get_info(soup)
+        wiki=get_wiki()
+        days=get_daily(wiki,int(info['confirmed']))
+        tests=get_tests(wiki)
+
+        cached_data = {
+            'statewise': statewise,
+            'info': info,
+            'days': days,
+            'tests': tests,
+            'confirmed':str(int(info['infected'])+int(info['cured'])+int(info['migrated'])+int(info['death']))
+        }
+
+        save_cache(cache_key, cached_data)
+        from_cache= 'false'
+
         
     t2 = time.time()
     compute = t2-t1
@@ -95,7 +136,26 @@ def get_info(soup):
     info_labels=['passengers','infected','cured','death','migrated']
     info_counts=[remove_html_tags(x) for x in counts]
     info=dict(zip(info_labels,info_counts))
-    return info
+
+    url="https://www.worldometers.info/coronavirus/country/india/"
+    response=requests.get(url)
+
+    worldo=BeautifulSoup(response.text, "html.parser")
+    worldo_counts=worldo.findAll("div",{"class": "maincounter-number"})
+    worldo_counts=[get_count(remove_html_tags(x)) for x in worldo_counts]
+    labels=['infected','death','cured']
+    info2=dict(zip(labels,worldo_counts))
+
+    active=info2['infected']-info2['death']-info2['cured']-int(info['migrated'])
+    if(int(info['infected'])>active):
+        info['confirmed']=str(int['infected']+int(info['cured'])+int(info['death'])+int(info['migrated']))
+        return info
+    else:
+        info['infected']=str(active)
+        info['death']=str(info2['death'])
+        info['cured']=str(info2['cured'])
+        info['confirmed']=str(info2['infected'])
+        return info
 
 def get_wiki():
     wiki_url="https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_India"
@@ -103,21 +163,30 @@ def get_wiki():
     wiki = BeautifulSoup(wiki_response.text, "html.parser")
     return wiki
 
-def get_daily(wiki):
-    counts=wiki.findAll("span", {"style":"width:2.45em; padding:0 0.3em 0 0; text-align:right; display:inline-block"})
+def get_daily(wiki,confirmed):
+    counts=wiki.findAll("span", {"style":"width:3.5em; padding:0 0.3em 0 0; text-align:right; display:inline-block"})
     dates=wiki.findAll("td",{"colspan":"2","style":"padding-left:0.4em; padding-right:0.4em; text-align:center"})
 
-    counts=[get_count(remove_html_tags(x)) for x in counts]
+    lst=list()
+    for no in counts:
+        try:
+            lst.append(get_count(remove_html_tags(no)))
+        except:
+            pass
+    counts=lst
+
     dates=[remove_html_tags(x) for x in dates]
 
     daily=dict(zip(dates,counts))
-
+    date=datetime.today()
+    date=date.strftime("%Y-%m-%d")
     del daily['⋮']
     del daily['2020-01-30']
     del daily['2020-02-02']
     del daily['2020-02-03']
     daily['2020-03-01']=3
     daily['2020-03-11']=65
+    daily[date]=confirmed
     days=dict()
     lst=list()
     for day in sorted(daily):
@@ -126,7 +195,6 @@ def get_daily(wiki):
         lst.append(day)
     days["date"]=lst
     days["infected"]=sorted(daily.values())
-
     return days
 
 def get_tests(wiki):
