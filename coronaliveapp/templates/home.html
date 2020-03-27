@@ -10,6 +10,35 @@
 </head>
 <body>
     <div class="main">
+
+        <div class="overview">
+            <div class="statbox" id="confirmed-box">
+                <div>Confirmed</div>
+                <div>{{dict.confirmed}}</div>
+            </div>
+            <div class="statbox" id="active-box">
+                <div>Active cases</div>
+                <div>{{dict.info.infected}}</div>
+            </div>
+            <div class="statbox" id="recovered-box">
+                <div>Recovered</div>
+                <div>{{dict.info.cured}}</div>
+            </div>
+            <div class="statbox" id="death-box">
+                <div>Death</div>
+                <div>{{dict.info.death}}</div>
+            </div>
+            <div class="statbox" id="totaltests-box">
+                <div>Tested individuals</div>
+                <div>{{dict.tests.inds}}</div>
+            </div>
+            <div class="statbox" id="permillion-box">
+                <div>Tests per million</div>
+                <div>{{dict.tests.perm}}</div>
+            </div>
+        </div>
+
+        
         <div class="section-1">
             <div class="linediv">
                 <figure class="highcharts-line">

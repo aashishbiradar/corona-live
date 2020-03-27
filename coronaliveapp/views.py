@@ -2,6 +2,7 @@
 import requests, json, re, urllib.request, time
 
 import pandas as pd
+from datetime import datetime
 from bs4 import BeautifulSoup
 
 from django.http import HttpResponse, JsonResponse
@@ -32,7 +33,8 @@ def home(req):
             'statewise': statewise,
             'info': info,
             'days': days,
-            'tests': tests
+            'tests': tests,
+            'confirmed':str(int(info['infected'])+int(info['cured'])+int(info['migrated'])+int(info['death']))
         }
 
         save_cache(cache_key, cached_data)
@@ -43,7 +45,8 @@ def home(req):
     return render(req,'home.html',{
         'data': mark_safe(json.dumps(cached_data)),
         'compute': compute,
-        'from_cache': from_cache
+        'from_cache': from_cache,
+        'dict': cached_data
     })
 
 def ping(req):
@@ -116,7 +119,12 @@ def get_daily(wiki):
     daily['2020-03-01']=3
     daily['2020-03-11']=65
     days=dict()
-    days["date"]=sorted(daily)
+    lst=list()
+    for day in sorted(daily):
+        d=datetime.strptime(day,"%Y-%m-%d")
+        day=d.strftime("%b %d")
+        lst.append(day)
+    days["date"]=lst
     days["infected"]=sorted(daily.values())
 
     return days
@@ -127,7 +135,7 @@ def get_tests(wiki):
 
     tests = {
         "perm":rows[1].text.replace('\n', ''),
-        "inds":rows[2].text.replace('\n', '').replace(",","")
+        "inds":rows[2].text.replace('\n', '')
     }
 
     return tests
