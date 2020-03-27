@@ -6,6 +6,42 @@ body{
     padding: 0;
     user-select: none;
 }
+.overview {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+.statbox{
+    background: #777;
+    min-width: 14.5%;
+    padding: 10px;
+    border-radius: 6px;
+    color: whitesmoke;
+    font-size: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#recovered-box {
+    background-image: linear-gradient(to right, #48d583,#1c7943);
+}
+#active-box {
+    
+    background-image: linear-gradient(to right,#2790d7,#175681);
+}
+
+#death-box {
+    background-image: linear-gradient(to right,#4c6b8a,#1c2732);
+}
+#totaltests-box {
+    background-image: linear-gradient(to right,#a265bb,#623475);
+}
+#permillion-box {
+    background-image: linear-gradient(to right,#59bbd3,#3fb1cb);
+}
+
+#confirmed-box {
+    background-image: linear-gradient(to right,#ca538b,#7f2750);
+}
 .main {
     max-width: 1300px;
     margin: 0 auto;   
@@ -42,5 +78,13 @@ footer{
     }
     .linediv { 
         width: 100%;
+    }
+    .overview {
+        flex-direction: column;
+    }
+    .statbox {
+        margin: 3px 10px;
+        display: flex;
+        justify-content: space-between;
     }
 }

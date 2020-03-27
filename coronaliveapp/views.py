@@ -2,6 +2,7 @@
 import requests, json, re, urllib.request, time
 
 import pandas as pd
+from datetime import datetime
 from bs4 import BeautifulSoup
 
 from django.http import HttpResponse, JsonResponse
@@ -10,6 +11,42 @@ from django.shortcuts import render
 
 from corona.models import Cache
 
+#route functions
+def home(req):
+    t1 = time.time()
+    cache_key = 'homepage'
+    expiry = 5 
+    cached_data = get_cache(cache_key, expiry)
+    from_cache= 'true'
+
+    if not cached_data:
+
+        soup=get_mohfw()
+        statewise=get_statewise(soup)
+        info=get_info(soup)
+        wiki=get_wiki()
+        days=get_daily(wiki)
+        tests=get_tests(wiki)
+
+        cached_data = {
+            'statewise': statewise,
+            'info': info,
+            'days': days,
+            'tests': tests,
+            'confirmed':str(int(info['infected'])+int(info['cured'])+int(info['migrated'])+int(info['death']))
+        }
+
+        save_cache(cache_key, cached_data)
+        from_cache= 'false'
+        
+    t2 = time.time()
+    compute = t2-t1
+    return render(req,'home.html',{
+        'data': mark_safe(json.dumps(cached_data)),
+        'compute': compute,
+        'from_cache': from_cache,
+        'dict': cached_data
+    })
 
 
 def get_mohfw():
@@ -78,7 +115,12 @@ def get_daily(wiki):
     daily['2020-03-01']=3
     daily['2020-03-11']=65
     days=dict()
-    days["date"]=sorted(daily)
+    lst=list()
+    for day in sorted(daily):
+        d=datetime.strptime(day,"%Y-%m-%d")
+        day=d.strftime("%b %d")
+        lst.append(day)
+    days["date"]=lst
     days["infected"]=sorted(daily.values())
 
     return days
@@ -89,7 +131,7 @@ def get_tests(wiki):
 
     tests={
         "perm":rows[1].text.replace('\n', ''),
-        "inds":rows[2].text.replace('\n', '').replace(",","")
+        "inds":rows[2].text.replace('\n', '')
     }
 
     return tests
