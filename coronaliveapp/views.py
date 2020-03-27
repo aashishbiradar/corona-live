@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from django.http import HttpResponse, JsonResponse
 from django.utils.safestring import mark_safe
 from django.shortcuts import render
+from django.utils import timezone
 
 from corona.models import Cache
 
@@ -48,7 +49,10 @@ def home(req):
         'dict': cached_data
     })
 
+def ping(req):
+    return HttpResponse('<h1>pong</h1>')
 
+#services
 def get_mohfw():
     url = "https://www.mohfw.gov.in/"
     response = requests.get(url)
@@ -126,43 +130,15 @@ def get_daily(wiki):
     return days
 
 def get_tests(wiki):
-    table=wiki.find("table",{"class":"wikitable plainrowheaders"})
-    rows=table.find_all('td')
+    table = wiki.find("table",{"class":"wikitable plainrowheaders"})
+    rows = table.find_all('td')
 
-    tests={
+    tests = {
         "perm":rows[1].text.replace('\n', ''),
         "inds":rows[2].text.replace('\n', '')
     }
 
     return tests
-
-
-
-def home(req):
-    t1 = time.time()
-    
-    soup=get_mohfw()
-    statewise=get_statewise(soup)
-    info=get_info(soup)
-    wiki=get_wiki()
-    days=get_daily(wiki)
-    tests=get_tests(wiki)
-
-
-    total={
-        "statewise" : statewise,
-        "info" : info,
-        "days" : days,
-        "tests":tests
-    }
-
-
-    t2 = time.time()
-    compute = t2-t1
-    return render(req,"home.html",{'total':mark_safe(json.dumps(total))})
-    #return render(req,'home.html',{'data': mark_safe(json.dumps(statewise)),'info':mark_safe(json.dumps(info)),'days':mark_safe(json.dumps(days)), 'compute' : compute})
-    #return JsonResponse(data)
-    #return HttpResponse(response.text)
 
 
 def remove_html_tags(text):
@@ -177,15 +153,19 @@ def get_count(text):
     num=int(re.findall(r'\d+', text)[0])
     return num
 
-def ping(req):
-    return HttpResponse('<h1>pong</h1>')
-
-def create(req):
-    key = 'key-'+str(time.time())
-    dict = {
-        'data1': time.time(),
-        'data2': "SOME TEXT"
-    }
-    cache = Cache(cache_key = key, data = json.dumps(dict))
+def save_cache(key,data):
+    try:
+        cache = Cache.objects.get(cache_key = key)
+        cache.data = json.dumps(data)
+    except Cache.DoesNotExist:
+        cache = Cache(cache_key = key, data = json.dumps(data))
     cache.save()
-    return HttpResponse(f'<h1>{key}</h1>')
+
+
+def get_cache(key, expiry_time = None):
+    try:
+        cache = Cache.objects.get(cache_key = key)
+        if not expiry_time or cache.updated_at + timezone.timedelta(minutes= expiry_time) > timezone.now():
+            return json.loads(cache.data)
+    except Cache.DoesNotExist:
+        pass

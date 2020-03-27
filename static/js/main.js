@@ -24,7 +24,7 @@ Highcharts.chart('linecontainer', {
             Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
     },
     xAxis: {
-        categories: total.days.date,
+        categories: data.days.date,
         plotBands: [{
             from: 4.5,
             to: 6.5,
@@ -50,11 +50,11 @@ Highcharts.chart('linecontainer', {
     },
     series: [{
         name: 'Infected',
-        data: total.days.infected
+        data: data.days.infected
     }]
 });
 
-var infectedTotal = (parseInt(total.info.infected)+parseInt(total.info.cured)+parseInt(total.info.migrated)+parseInt(total.info.death));
+var infectedTotal = (parseInt(data.info.infected)+parseInt(data.info.cured)+parseInt(data.info.migrated)+parseInt(data.info.death));
 Highcharts.chart('piecontainer', {
     chart: {
         type: 'pie',
@@ -88,24 +88,24 @@ Highcharts.chart('piecontainer', {
         data: [
             {
                 name: 'Active',
-                y: parseInt(total.info.infected),
+                y: parseInt(data.info.infected),
                 color: '#3498db '
             },
             {
                 name: 'Recovered',
-                y: parseInt(total.info.cured),
+                y: parseInt(data.info.cured),
                 sliced: true,
                 selected: true,
                 color: '#2ecc71'
             },
             {
                 name: 'Migrated',
-                y: parseInt(total.info.migrated),
+                y: parseInt(data.info.migrated),
                 color: '#9b59b6'
             },
             {
                 name: 'Death',
-                y: parseInt(total.info.death),
+                y: parseInt(data.info.death),
                 color: '#34495e'
             }
         ]
@@ -125,7 +125,7 @@ Highcharts.chart('container', {
         }
     },
     xAxis: {
-        categories: total.statewise.state
+        categories: data.statewise.state
     },
     yAxis: {
         min: 0,
@@ -144,19 +144,19 @@ Highcharts.chart('container', {
     },
     series: [{
         name: 'Indian',
-        data: total.statewise.indian,
+        data: data.statewise.indian,
         color: '#3498db'
     }, {
         name: 'Foreign Nationals',
-        data: total.statewise.foreign,
+        data: data.statewise.foreign,
         color: '#9b59b6'
     }, {
         name: 'Recovered',
-        data: total.statewise.discharged,
+        data: data.statewise.discharged,
         color: '#2ecc71'
     }, {
         name: 'Death',
-        data: total.statewise.death,
+        data: data.statewise.death,
         color: '#34495e'
     }]
 });
