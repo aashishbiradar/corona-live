@@ -35,12 +35,9 @@
     </footer>
 </body>
 <script>
-    data = {{data}};
-    info={{info}};
-    days={{days}};
-    compute = '{{compute}}';
-    from_cache = '{{from_cache}}';
+    var data = {{data}};
 </script>
-<script defer src="https://code.highcharts.com/highcharts.js"></script>
-<script defer src="{% static 'js/main.js' %}?v=1.0.3"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="{% static 'js/main.js' %}?v=1.0.5"></script>
 </html>
+<!--compute={{compute}} from_cache={{from_cache}}-->
