@@ -21,26 +21,26 @@ def home(req):
     from_cache= 'true'
 
     if not cached_data:
-        #try:
-        soup=get_mohfw()
-        statewise=get_statewise(soup)
-        info=get_info(soup)
-        wiki=get_wiki()
-        days=get_daily(wiki,int(info['confirmed']))
-        tests=get_tests(wiki)
+        try:
+            soup=get_mohfw()
+            statewise=get_statewise(soup)
+            info=get_info(soup)
+            wiki=get_wiki()
+            days=get_daily(wiki,int(info['confirmed']))
+            tests=get_tests(wiki)
 
-        cached_data = {
-            'statewise': statewise,
-            'info': info,
-            'days': days,
-            'tests': tests,
-            'confirmed':str(int(info['infected'])+int(info['cured'])+int(info['migrated'])+int(info['death']))
-        }
+            cached_data = {
+                'statewise': statewise,
+                'info': info,
+                'days': days,
+                'tests': tests,
+                'confirmed':str(int(info['infected'])+int(info['cured'])+int(info['migrated'])+int(info['death']))
+            }
 
-        save_cache(cache_key, cached_data)
-        from_cache= 'false'
-        #except:
-        #    cached_data = get_cache(cache_key)
+            save_cache(cache_key, cached_data)
+            from_cache= 'false'
+        except:
+            cached_data = get_cache(cache_key)
 
         
     t2 = time.time()
