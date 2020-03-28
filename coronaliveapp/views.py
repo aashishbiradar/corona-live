@@ -2,7 +2,7 @@
 import requests, json, re, urllib.request, time
 
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 from bs4 import BeautifulSoup
 
 from django.http import HttpResponse, JsonResponse
@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from django.shortcuts import render
 from django.utils import timezone
 
-from corona.models import Cache
+from corona.models import Cache, Daily
 
 #route functions
 def home(req):
@@ -24,17 +24,55 @@ def home(req):
         try:
             soup=get_mohfw()
             statewise=get_statewise(soup)
-            info=get_info(soup)
             wiki=get_wiki()
-            days=get_daily(wiki,int(info['confirmed']))
             tests=get_tests(wiki)
+
+            #latest data
+            latest = get_info(soup)
+            
+            try:
+                latest_rec = Daily.objects.get(date = date.today())
+                latest_rec.confirmed = int(latest['confirmed'])
+                latest_rec.active = int(latest['infected'])
+                latest_rec.recovered = int(latest['cured'])
+                latest_rec.death = int(latest['death'])
+                latest_rec.source = latest['source']
+            except Daily.DoesNotExist:
+                latest_rec = Daily(
+                    date = date.today(),
+                    confirmed = int(latest['confirmed']),
+                    active = int(latest['infected']),
+                    recovered = int(latest['cured']),
+                    death = int(latest['death']),
+                    source = latest['source']
+                )
+            latest_rec.save()
+
+            #daily data
+            daily_df = pd.DataFrame(Daily.objects.all().values())
+            daily_df['date'] = pd.to_datetime(daily_df['date'])
+            daily_df.sort_values(by=['date'])
+            daily_df['date'] = daily_df['date'].dt.strftime('%b %d')
+            
+            days = {
+                'date': daily_df['date'].tolist(),
+                'confirmed': daily_df['confirmed'].tolist(),
+                'recovered': daily_df['recovered'].tolist(),
+                'death': daily_df['death'].tolist()
+            }
+
+            info = {
+                'confirmed': days['confirmed'][-1],
+                'active': daily_df['active'].tolist()[-1],
+                'recovered': days['recovered'][-1],
+                'death': days['death'][-1]
+            }
 
             cached_data = {
                 'statewise': statewise,
                 'info': info,
                 'days': days,
                 'tests': tests,
-                'confirmed':str(int(info['infected'])+int(info['cured'])+int(info['migrated'])+int(info['death']))
             }
 
             save_cache(cache_key, cached_data)
@@ -56,7 +94,7 @@ def home(req):
 #route functions
 def adarsh(req):
     t1 = time.time()
-    cache_key = 'homepage'
+    cache_key = 'adarsh'
     expiry = 5 
     cached_data = get_cache(cache_key, expiry)
     from_cache= 'true'
@@ -64,17 +102,55 @@ def adarsh(req):
     if True or not cached_data:
         soup=get_mohfw()
         statewise=get_statewise(soup)
-        info=get_info(soup)
         wiki=get_wiki()
-        days=get_daily(wiki,int(info['confirmed']))
         tests=get_tests(wiki)
+        
+        #latest data
+        latest = get_info(soup)
+        
+        try:
+            latest_rec = Daily.objects.get(date = date.today())
+            latest_rec.confirmed = int(latest['confirmed'])
+            latest_rec.active = int(latest['infected'])
+            latest_rec.recovered = int(latest['cured'])
+            latest_rec.death = int(latest['death'])
+            latest_rec.source = latest['source']
+        except Daily.DoesNotExist:
+            latest_rec = Daily(
+                date = date.today(),
+                confirmed = int(latest['confirmed']),
+                active = int(latest['infected']),
+                recovered = int(latest['cured']),
+                death = int(latest['death']),
+                source = latest['source']
+            )
+        latest_rec.save()
+
+        #daily data
+        daily_df = pd.DataFrame(Daily.objects.all().values())
+        daily_df['date'] = pd.to_datetime(daily_df['date'])
+        daily_df.sort_values(by=['date'])
+        daily_df['date'] = daily_df['date'].dt.strftime('%b %d')
+        
+        days = {
+            'date': daily_df['date'].tolist(),
+            'confirmed': daily_df['confirmed'].tolist(),
+            'recovered': daily_df['recovered'].tolist(),
+            'death': daily_df['death'].tolist()
+        }
+
+        info = {
+            'confirmed': days['confirmed'][-1],
+            'active': daily_df['active'].tolist()[-1],
+            'recovered': days['recovered'][-1],
+            'death': days['death'][-1]
+        }
 
         cached_data = {
             'statewise': statewise,
             'info': info,
             'days': days,
-            'tests': tests,
-            'confirmed':str(int(info['infected'])+int(info['cured'])+int(info['migrated'])+int(info['death']))
+            'tests': tests
         }
 
         save_cache(cache_key, cached_data)
@@ -83,7 +159,7 @@ def adarsh(req):
         
     t2 = time.time()
     compute = t2-t1
-    return render(req,'home.html',{
+    return render(req,'adarsh.html',{
         'data': mark_safe(json.dumps(cached_data)),
         'compute': compute,
         'from_cache': from_cache,
@@ -136,6 +212,7 @@ def get_info(soup):
     info_labels=['passengers','infected','cured','death','migrated']
     info_counts=[remove_html_tags(x) for x in counts]
     info=dict(zip(info_labels,info_counts))
+    info['source'] = 'mohfw'
 
     url="https://www.worldometers.info/coronavirus/country/india/"
     response=requests.get(url)
@@ -155,6 +232,7 @@ def get_info(soup):
         info['death']=str(info2['death'])
         info['cured']=str(info2['cured'])
         info['confirmed']=str(info2['infected'])
+        info['source'] = 'worldometers'
         return info
 
 def get_wiki():

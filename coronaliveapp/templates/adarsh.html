@@ -1,4 +1,71 @@
-Highcharts.chart('linecontainer', {
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corona India Live Updates</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.6">
+</head>
+<body>
+    <div class="main">
+        <div class="overview">
+            <div class="statbox" id="confirmed-box">
+                <div>Confirmed</div>
+                <div>{{dict.info.confirmed}}</div>
+            </div>
+            <div class="statbox" id="active-box">
+                <div>Active cases</div>
+                <div>{{dict.info.active}}</div>
+            </div>
+            <div class="statbox" id="recovered-box">
+                <div>Recovered</div>
+                <div>{{dict.info.recovered}}</div>
+            </div>
+            <div class="statbox" id="death-box">
+                <div>Death</div>
+                <div>{{dict.info.death}}</div>
+            </div>
+            <div class="statbox" id="totaltests-box">
+                <div>Tested individuals</div>
+                <div>{{dict.tests.inds}}</div>
+            </div>
+            <div class="statbox" id="permillion-box">
+                <div>Tests per million</div>
+                <div>{{dict.tests.perm}}</div>
+            </div>
+        </div>
+        <div class="section-1">
+            <div class="linediv">
+                <figure class="highcharts-line">
+                    <div id="linecontainer"></div>
+                </figure>
+            </div>
+            <div class="piediv">
+                <figure class="highcharts-pie">
+                    <div id='piecontainer'></div>
+                </figure>
+            </div>
+        </div>
+        <div class="section-2">
+            <figure class="highcharts-figure">
+                <div id="container"></div>
+            </figure>
+        </div>
+    </div>
+    <footer>
+        <div>
+            Let's fight Corona together!
+        </div>
+    </footer>
+</body>
+<script>
+    var data = {{data}};
+</script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+    Highcharts.chart('linecontainer', {
     chart: {
         type: 'area'
     },
@@ -124,6 +191,7 @@ Highcharts.chart('piecontainer', {
         ]
     }]
 });
+
 Highcharts.chart('container', {
     chart: {
         type: 'bar'
@@ -172,3 +240,13 @@ Highcharts.chart('container', {
         color: '#34495e'
     }]
 });
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-66396003-2"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-66396003-2');
+</script>
+</html>
+<!--compute={{compute}} from_cache={{from_cache}}-->
