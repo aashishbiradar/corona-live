@@ -1,6 +1,15 @@
+#import django models
+import sys, os, django
+sys.path.append('/system/coronaproj/coronaliveapp/')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "coronaliveapp.settings")
+django.setup()
+
 import pandas as pd
 from bs4 import BeautifulSoup
 import re, requests
+from django.utils.dateparse import parse_date
+
+from corona.models import Daily
 
 def remove_html_tags(text):
     """Remove html tags from a string"""
@@ -41,7 +50,21 @@ daily=daily.reset_index().drop('index',axis=1)
 
 daily['confirmed']=daily['active']+daily['recovered']+daily['death']
 
+daily['dates'] = daily['dates'].apply(parse_date)
 
+daily_records = daily.to_dict('records')
 
+daily_instances = [Daily(
+    date = record['dates'],
+    confirmed = record['confirmed'],
+    active = record['active'],
+    recovered = record['recovered'],
+    death = record['death'],
+    source = 'wikipedia',
+) for record in daily_records]
 
+print('script suppressed!')
 
+#Daily.objects.bulk_create(daily_instances)
+
+#print('success!')
