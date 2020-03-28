@@ -1,2 +1,2 @@
 # corona-live
-[Coronavirus in India Live Updates](http://www.coronaindia.ml/)
+[Coronavirus in India Live Updates](https://www.coronaindia.ml/)
