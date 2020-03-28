@@ -8,12 +8,11 @@ class Cache(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class Daily(models.Model):
-    date = models.DateField()
+    date = models.DateField(primary_key = True)
     confirmed = models.IntegerField()
     active = models.IntegerField()
     recovered = models.IntegerField()
     death = models.IntegerField()
-    migrated = models.IntegerField()
     source = models.CharField(max_length = 255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
