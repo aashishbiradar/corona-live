@@ -155,13 +155,9 @@ Highcharts.chart('container', {
         }
     },
     series: [{
-        name: 'Indian',
-        data: data.statewise.indian,
+        name: 'Active',
+        data: data.statewise.active,
         color: '#3498db'
-    }, {
-        name: 'Foreign Nationals',
-        data: data.statewise.foreign,
-        color: '#9b59b6'
     }, {
         name: 'Recovered',
         data: data.statewise.discharged,
