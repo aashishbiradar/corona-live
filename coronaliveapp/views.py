@@ -311,7 +311,7 @@ def remove_html_tags(text):
 
 
 def get_count(text):
-    text=str(text)
+    text=str(text).replace(",","")
     num=int(re.findall(r'\d+', text)[0])
     return num
 
