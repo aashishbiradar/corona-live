@@ -6,34 +6,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corona India Live Updates</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
-    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.6">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.7">
 </head>
 <body>
     <div class="main">
         <div class="overview">
             <div class="statbox" id="confirmed-box">
-                <div>Confirmed cases</div>
-                <div>{{dict.info.confirmed}}</div>
+                <div class="left">
+                    <div class="label">Confirmed</div>
+                    <div class="percentage">{{dict.info.percentageconfirmed}}% &#8593;</div>
+                </div><div class="right">
+                    <div class="total">{{dict.info.confirmed}}</div>
+                    <div class="increase">[+{{dict.info.diffconfirmed}}]</div>
+                </div>
             </div>
             <div class="statbox" id="active-box">
-                <div>Active cases</div>
-                <div>{{dict.info.active}}</div>
+                <div class="left">
+                    <div class="label">Active</div>
+                    <div class="percentage">{{dict.info.percentageactive}}% &#8593;</div>
+                </div>
+                <div class="right">
+                    <div class="total">{{dict.info.active}}</div>
+                    <div class="increase">[+{{dict.info.diffactive}}]</div>
+                </div>
+
             </div>
             <div class="statbox" id="recovered-box">
-                <div>Recovered</div>
-                <div>{{dict.info.recovered}}</div>
+                <div class="left">
+                    <div class="label">Recovered</div class="label">
+                    <div class="percentage">{{dict.info.percentagerecovered}}% &#8593;</div>
+                </div>
+                <div class="right">
+                    <div class="total">{{dict.info.recovered}}</div>
+                    <div class="increase">[+{{dict.info.diffrecovered}}]</div>
+                </div>
             </div>
             <div class="statbox" id="death-box">
-                <div>Death</div>
-                <div>{{dict.info.death}}</div>
+                <div class="left">
+                    <div class="label">Death</div class="label">
+                    <div class="percentage">{{dict.info.percentagedeath}}% &#8593;</div>
+                </div>
+                <div class="right">
+                    <div class="total">{{dict.info.death}}</div>
+                    <div class="increase">[+{{dict.info.diffdeath}}]</div>
+                </div>
             </div>
             <div class="statbox" id="totaltests-box">
-                <div>Tested individuals</div>
-                <div>{{dict.tests.inds}}</div>
+                <div class="left">
+                <div class="label">Tested<br>individuals</div>
+                </div>
+                <div class="right">
+                <div class="total">34,931</div>
+                </div>
             </div>
             <div class="statbox" id="permillion-box">
-                <div>Tests per million</div>
-                <div>{{dict.tests.perm}}</div>
+                <div class="left">
+                <div class="label">Tests per million</div>
+                </div>
+                <div class="right">
+                <div class="total">27</div>
+                </div>
             </div>
         </div>
         <div class="section-1">
@@ -64,7 +96,7 @@
     var data = {{data}};
 </script>
 <script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="{% static 'js/main.js' %}?v=1.0.6"></script>
+<script src="{% static 'js/main.js' %}?v=1.0.7"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-66396003-2"></script>
 <script>
     window.dataLayer = window.dataLayer || [];

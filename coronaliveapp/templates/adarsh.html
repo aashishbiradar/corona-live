@@ -12,6 +12,16 @@
             display: flex;
             justify-content: space-between;
         }
+        .right {
+            display: flex;
+        }
+        .total {
+            font-size: 30px;
+        }
+        .increase {
+            font-size: 11px;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
@@ -19,54 +29,58 @@
         <div class="overview">
             <div class="statbox" id="confirmed-box">
                 <div class="left">
-                    <div>Confirmed cases</div>
-                    <div>{{dict.info.confirmed}}</div>
+                    <div class="label">Confirmed</div>
+                    <div class="percentage">{{dict.info.percentageconfirmed}}% &#8593;</div>
                 </div><div class="right">
-                    <div>[+{{dict.info.diffconfirmed}}]</div>
-                    <div>{{dict.info.percentageconfirmed}}%</div>
+                    <div class="total">{{dict.info.confirmed}}</div>
+                    <div class="increase">[+{{dict.info.diffconfirmed}}]</div>
                 </div>
             </div>
             <div class="statbox" id="active-box">
                 <div class="left">
-                    <div>Active cases</div>
-                    <div>{{dict.info.active}}</div>
+                    <div class="label">Active</div>
+                    <div class="percentage">{{dict.info.percentageactive}}% &#8593;</div>
                 </div>
                 <div class="right">
-                    <div>[+{{dict.info.diffactive}}]</div>
-                    <div>{{dict.info.percentageactive}}%</div>
+                    <div class="total">{{dict.info.active}}</div>
+                    <div class="increase">[+{{dict.info.diffactive}}]</div>
                 </div>
 
             </div>
             <div class="statbox" id="recovered-box">
                 <div class="left">
-                    <div>Recovered</div>
-                    <div>{{dict.info.recovered}}</div>
+                    <div class="label">Recovered</div class="label">
+                    <div class="percentage">{{dict.info.percentagerecovered}}% &#8593;</div>
                 </div>
                 <div class="right">
-                    <div>[+{{dict.info.diffrecovered}}]</div>
-                    <div>{{dict.info.percentagerecovered}}%</div>
+                    <div class="total">{{dict.info.recovered}}</div>
+                    <div class="increase">[+{{dict.info.diffrecovered}}]</div>
                 </div>
             </div>
             <div class="statbox" id="death-box">
                 <div class="left">
-                    <div>Death</div>
-                    <div>{{dict.info.death}}</div>
+                    <div class="label">Death</div class="label">
+                    <div class="percentage">{{dict.info.percentagedeath}}% &#8593;</div>
                 </div>
                 <div class="right">
-                    <div>[+{{dict.info.diffdeath}}]</div>
-                    <div>{{dict.info.percentagedeath}}%</div>
+                    <div class="total">{{dict.info.death}}</div>
+                    <div class="increase">[+{{dict.info.diffdeath}}]</div>
                 </div>
             </div>
             <div class="statbox" id="totaltests-box">
                 <div class="left">
-                <div>Tested individuals</div>
-                <div>{{dict.tests.inds}}</div>
+                <div class="label">Tested<br>individuals</div>
+                </div>
+                <div class="right">
+                <div class="total">34,931</div>
                 </div>
             </div>
             <div class="statbox" id="permillion-box">
                 <div class="left">
-                <div>Tests per million</div>
-                <div>{{dict.tests.perm}}</div>
+                <div class="label">Tests per million</div>
+                </div>
+                <div class="right">
+                <div class="total">27</div>
                 </div>
             </div>
         </div>
@@ -83,9 +97,14 @@
             </div>
         </div>
         <div class="section-2">
-            <figure class="highcharts-figure">
-                <div id="container"></div>
-            </figure>
+        <div>
+
+        </div>
+            <div>
+                <figure class="highcharts-figure">
+                    <div id="container"></div>
+                </figure>
+            </div>
         </div>
     </div>
     <footer>
@@ -257,14 +276,10 @@ Highcharts.chart('container', {
         }
     },
     series: [{
-        name: 'Indian',
-        data: data.statewise.indian,
+        name: 'Active',
+        data: data.statewise.active,
         color: '#3498db'
-    }, {
-        name: 'Foreign Nationals',
-        data: data.statewise.foreign,
-        color: '#9b59b6'
-    }, {
+    },{
         name: 'Recovered',
         data: data.statewise.discharged,
         color: '#2ecc71'

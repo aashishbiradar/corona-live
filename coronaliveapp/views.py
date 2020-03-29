@@ -20,7 +20,7 @@ def home(req):
     cached_data = get_cache(cache_key, expiry)
     from_cache= 'true'
 
-    if True or not cached_data:
+    if not cached_data:
         try:
             soup=get_mohfw()
             statewise=get_statewise(soup)
@@ -65,8 +65,17 @@ def home(req):
                 'confirmed': days['confirmed'][-1],
                 'active': daily_df['active'].tolist()[-1],
                 'recovered': days['recovered'][-1],
-                'death': days['death'][-1]
+                'death': days['death'][-1],
+                'diffconfirmed': days['confirmed'][-1]-days['confirmed'][-2],
+                'diffactive': daily_df['active'].tolist()[-1]-daily_df['active'].tolist()[-2],
+                'diffrecovered': days['recovered'][-1]-days['recovered'][-2],
+                'diffdeath': days['death'][-1]-days['death'][-2]
             }
+
+            info['percentageconfirmed']=round(info['diffconfirmed']*100/days['confirmed'][-2])
+            info['percentageactive']=round(info['diffactive']*100/daily_df['active'].tolist()[-2])
+            info['percentagerecovered']=round(info['diffrecovered']*100/days['recovered'][-2])
+            info['percentagedeath']=round(info['diffdeath']*100/days['death'][-2])
 
             cached_data = {
                 'statewise': statewise,
@@ -207,6 +216,7 @@ def get_statewise(soup):
                 pass
     data=pd.DataFrame(list(zip(state,indian,foreign,discharged,death)),columns=['state','indian','foreign','discharged','death'])
     data['total']=data['indian']+data['foreign']+data['discharged']+data['death']
+    data['active']=data['indian']+data['foreign']
     data.sort_values(by='total',axis=0,ascending=False,inplace=True)
     statewise = data.to_dict()
     info=dict()
@@ -300,7 +310,7 @@ def check_state(text):
     if text in lst:
         return text
     else:
-        raise Exception("Sorry")
+        raise Exception("Not a state")
 
 
 def remove_html_tags(text):

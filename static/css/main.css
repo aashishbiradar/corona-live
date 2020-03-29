@@ -12,6 +12,8 @@ body{
     margin-top: 15px;
 }
 .statbox{
+    display: flex;
+    justify-content: space-between;
     background: #777;
     min-width: 14.5%;
     padding: 10px;
@@ -20,7 +22,16 @@ body{
     font-size: 15px;
     font-family: Arial, Helvetica, sans-serif;
 }
-
+.right {
+    display: flex;
+}
+.total {
+    font-size: 30px;
+}
+.increase {
+    font-size: 11px;
+    margin-top: 15px;
+}
 #recovered-box {
     background-image: linear-gradient(to right, #48d583,#1c7943);
 }
