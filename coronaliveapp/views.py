@@ -129,7 +129,7 @@ def adarsh(req):
         #daily data
         daily_df = pd.DataFrame(Daily.objects.all().values())
         daily_df['date'] = pd.to_datetime(daily_df['date'])
-        daily_df.sort_values(by=['date'])
+        daily_df.sort_values(by=['date'],inplace=True)
         daily_df['date'] = daily_df['date'].dt.strftime('%b %d')
         
         days = {
@@ -143,8 +143,17 @@ def adarsh(req):
             'confirmed': days['confirmed'][-1],
             'active': daily_df['active'].tolist()[-1],
             'recovered': days['recovered'][-1],
-            'death': days['death'][-1]
+            'death': days['death'][-1],
+            'diffconfirmed': days['confirmed'][-1]-days['confirmed'][-2],
+            'diffactive': daily_df['active'].tolist()[-1]-daily_df['active'].tolist()[-2],
+            'diffrecovered': days['recovered'][-1]-days['recovered'][-2],
+            'diffdeath': days['death'][-1]-days['death'][-2]
         }
+
+        info['percentageconfirmed']=round(info['diffconfirmed']*100/days['confirmed'][-2])
+        info['percentageactive']=round(info['diffactive']*100/daily_df['active'].tolist()[-2])
+        info['percentagerecovered']=round(info['diffrecovered']*100/days['recovered'][-2])
+        info['percentagedeath']=round(info['diffdeath']*100/days['death'][-2])
 
         cached_data = {
             'statewise': statewise,
@@ -188,6 +197,7 @@ def get_statewise(soup):
         lst=row.find_all('td')
         if(len(lst)==6):
             try:
+                check_state((remove_html_tags(lst[1])))
                 state.append((remove_html_tags(lst[1])))
                 indian.append(get_count(remove_html_tags(lst[2])))
                 foreign.append(get_count(remove_html_tags(lst[3])))
@@ -195,7 +205,6 @@ def get_statewise(soup):
                 death.append(get_count(remove_html_tags(lst[5])))
             except:
                 pass
-
     data=pd.DataFrame(list(zip(state,indian,foreign,discharged,death)),columns=['state','indian','foreign','discharged','death'])
     data['total']=data['indian']+data['foreign']+data['discharged']+data['death']
     data.sort_values(by='total',axis=0,ascending=False,inplace=True)
@@ -285,6 +294,13 @@ def get_tests(wiki):
     }
 
     return tests
+def check_state(text):
+    text=str(text)
+    lst=["Andhra Pradesh","Arunachal Pradesh ","Andaman and Nicobar Islands","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Telengana","Ladakh","Himachal Pradesh","Jammu and Kashmir","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Andaman and Nicobar","Chandigarh","Dadra and Nagar Haveli","Daman and Diu","Lakshadweep","Delhi","Puducherry"]
+    if text in lst:
+        return text
+    else:
+        raise Exception("Sorry")
 
 
 def remove_html_tags(text):
