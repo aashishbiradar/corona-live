@@ -20,7 +20,7 @@ def home(req):
     cached_data = get_cache(cache_key, expiry)
     from_cache= 'true'
 
-    if True or not cached_data:
+    if not cached_data:
         try:
             soup=get_mohfw()
             statewise=get_statewise(soup)
