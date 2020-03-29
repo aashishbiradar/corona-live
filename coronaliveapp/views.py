@@ -20,7 +20,7 @@ def home(req):
     cached_data = get_cache(cache_key, expiry)
     from_cache= 'true'
 
-    if not cached_data:
+    if True or not cached_data:
         try:
             soup=get_mohfw()
             statewise=get_statewise(soup)
@@ -51,7 +51,7 @@ def home(req):
             #daily data
             daily_df = pd.DataFrame(Daily.objects.all().values())
             daily_df['date'] = pd.to_datetime(daily_df['date'])
-            daily_df.sort_values(by=['date'])
+            daily_df.sort_values(by=['date'], inplace=True)
             daily_df['date'] = daily_df['date'].dt.strftime('%b %d')
             
             days = {
