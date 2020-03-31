@@ -8,19 +8,22 @@
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
     <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.6">
     <style>
-        .statbox {
-            display: flex;
-            justify-content: space-between;
+        table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 20px;
         }
-        .right {
-            display: flex;
+
+
+        td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
         }
-        .total {
-            font-size: 30px;
-        }
-        .increase {
-            font-size: 11px;
-            margin-top: 15px;
+
+        tr:nth-child(even) {
+        background-color: #dddddd;
         }
     </style>
 </head>
@@ -97,14 +100,26 @@
             </div>
         </div>
         <div class="section-2">
-        <div>
-
-        </div>
             <div>
                 <figure class="highcharts-figure">
                     <div id="container"></div>
                 </figure>
             </div>
+        </div>
+        <div>
+            <table id="statewise-table">
+                <thead>
+                    <tr>
+                     <th>State</th>
+                     <th>Confirmed</th>
+                     <th>Active</th>
+                     <th>Recovered</th>
+                     <th>Death</th>
+                   </tr>
+                </thead>
+                <tbody id='statewise-tbody'>
+                </tbody>
+            </table>
         </div>
     </div>
     <footer>
@@ -118,6 +133,37 @@
 </script>
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script>
+
+
+    var a=[];
+    for(i=0;i<4;i++)
+    {
+        a[i]=data.days.confirmed[i];
+    }
+    for(i=4;i<data.days.confirmed.length;i++)
+    {
+        a[i] = (a[i-1]*0.16+a[i-1]);
+    }
+    for (let i in a) {
+        a[i] = Math.ceil(a[i]);
+    }
+    
+
+    for (i = 0; i < data.statewise.state.length; i++) 
+    {
+        var table=document.getElementById('statewise-tbody');
+        var row=table.insertRow(i);
+        var state=row.insertCell(0);
+        var confirmed=row.insertCell(1)
+        var active=row.insertCell(2);
+        var recovered=row.insertCell(3);
+        var death=row.insertCell(4);
+        confirmed.innerHTML=data.statewise.confirmed[i];
+        state.innerHTML=data.statewise.state[i];
+        active.innerHTML=data.statewise.active[i];
+        recovered.innerHTML=data.statewise.discharged[i];
+        death.innerHTML=data.statewise.death[i]; 
+    }
     Highcharts.chart('linecontainer', {
     chart: {
         type: 'area'
@@ -146,9 +192,14 @@
     xAxis: {
         categories: data.days.date,
         plotBands: [{
-            from: 4.5,
-            to: 6.5,
-            color: 'rgba(68, 170, 213, .2)'
+            from: 23,
+            to:data.days.date.length,
+            color: 'rgba(68, 170, 213, .2)',
+            label: { 
+            text: '21 days lockdown', // Content of the label. 
+            align: 'center', // Positioning of the label. 
+            //Default to center. x: +10 // Amount of pixels the label will be repositioned according to the alignment. 
+            }
         }]
     },
     yAxis: {
@@ -177,7 +228,12 @@
             }
         },
     },
-    series: [{
+    series: [ {
+        name: '15% increase daily',
+        data: a,
+        color: '#f7df1e'
+    },
+    {
         name: 'Confirmed Cases',
         data: data.days.confirmed,
         color: '#3498db'

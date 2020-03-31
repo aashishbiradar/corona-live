@@ -3,7 +3,7 @@ import requests, json, re, urllib.request, time
 
 import pandas as pd
 from datetime import datetime, date
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 
 from django.http import HttpResponse, JsonResponse
 from django.utils.safestring import mark_safe
@@ -147,6 +147,13 @@ def adarsh(req):
             'recovered': daily_df['recovered'].tolist(),
             'death': daily_df['death'].tolist()
         }
+        days['confirmedincrease']=[days['confirmed'][0]]
+        days['recoveredincrease']=[days['recovered'][0]]
+        days['deathincrease']=[days['death'][0]]
+        for i in range(1,len(days['confirmed'])):
+            days['confirmedincrease'].append(days['confirmed'][i]-days['confirmed'][i-1])
+            days['recoveredincrease'].append(days['recovered'][i]-days['recovered'][i-1])
+            days['deathincrease'].append(days['death'][i]-days['death'][i-1])
 
         info = {
             'confirmed': days['confirmed'][-1],
@@ -196,28 +203,34 @@ def get_mohfw():
 
 
 def get_statewise(soup):
-    tab=soup.find_all('tr')
+    
+    table=soup.find('div',{'id':'cases'})
+    tbody=table.find('tbody')
+    trows=tbody.findAll('tr')
+
+
     state=list()
-    indian=list()
-    foreign=list()
+    confirmed=list()
     discharged=list()
     death=list()
-    for row in tab:
+    for row in trows:
+        for element in row(text=lambda text: isinstance(text, Comment)):
+            element.extract()
         lst=row.find_all('td')
-        if(len(lst)==6):
+        if(len(lst)==5):
             try:
                 check_state((remove_html_tags(lst[1])))
                 state.append((remove_html_tags(lst[1])))
-                indian.append(get_count(remove_html_tags(lst[2])))
-                foreign.append(get_count(remove_html_tags(lst[3])))
-                discharged.append(get_count(remove_html_tags(lst[4])))
-                death.append(get_count(remove_html_tags(lst[5])))
+                confirmed.append(get_count(remove_html_tags(lst[2])))
+                discharged.append(get_count(remove_html_tags(lst[3])))
+                death.append(get_count(remove_html_tags(lst[4])))
             except:
                 pass
-    data=pd.DataFrame(list(zip(state,indian,foreign,discharged,death)),columns=['state','indian','foreign','discharged','death'])
-    data['total']=data['indian']+data['foreign']+data['discharged']+data['death']
-    data['active']=data['indian']+data['foreign']
-    data.sort_values(by='total',axis=0,ascending=False,inplace=True)
+        else:
+            pass
+    data=pd.DataFrame(list(zip(state,confirmed,discharged,death)),columns=['state','confirmed','discharged','death'])
+    data['active']=data['confirmed']-data['discharged']-data['death']
+    data.sort_values(by='confirmed',axis=0,ascending=False,inplace=True)
     statewise = data.to_dict()
     info=dict()
 
@@ -244,7 +257,7 @@ def get_info(soup):
 
     active=info2['infected']-info2['death']-info2['cured']-int(info['migrated'])
     if(int(info['infected'])>active):
-        info['confirmed']=str(int['infected']+int(info['cured'])+int(info['death'])+int(info['migrated']))
+        info['confirmed']=str(int(info['infected'])+int(info['cured'])+int(info['death'])+int(info['migrated']))
         return info
     else:
         info['infected']=str(active)
