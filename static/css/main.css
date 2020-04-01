@@ -106,11 +106,27 @@ footer{
         width: 100%;
     }
     .overview {
-        flex-direction: column;
+        margin: 0;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
     }
     .statbox {
-        margin: 3px 10px;
+        margin: 10px 0 0 0;
+        flex-direction: column;
+        width: 40%;
+    }
+    .left{
         display: flex;
         justify-content: space-between;
+    }
+    .increase{
+        margin-top: 11px;
+    }
+    .total {
+        font-size: 24px;
+    }
+    .btn-section{
+        text-align: center;
+        margin: 0 0 20px 0;
     }
 }
