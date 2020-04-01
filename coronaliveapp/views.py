@@ -60,7 +60,21 @@ def home(req):
                 'recovered': daily_df['recovered'].tolist(),
                 'death': daily_df['death'].tolist()
             }
+            days['confirmedincrease']=[days['confirmed'][0]]
+            days['recoveredincrease']=[days['recovered'][0]]
+            days['deathincrease']=[days['death'][0]]
+            for i in range(1,len(days['confirmed'])):
+                days['confirmedincrease'].append(days['confirmed'][i]-days['confirmed'][i-1])
+                days['recoveredincrease'].append(days['recovered'][i]-days['recovered'][i-1])
+                days['deathincrease'].append(days['death'][i]-days['death'][i-1])
 
+            """
+            days['predict']=list()
+            for i in range(0,4):
+                days['predict'].append(days['confirmed'][i])
+            for i in range(4,len(days['confirmed'])):
+                days['predict'].append(int(days['predict'][i-1]*0.17+days['predict'][i-1]))
+            """
             info = {
                 'confirmed': days['confirmed'][-1],
                 'active': daily_df['active'].tolist()[-1],
@@ -155,6 +169,13 @@ def adarsh(req):
             days['recoveredincrease'].append(days['recovered'][i]-days['recovered'][i-1])
             days['deathincrease'].append(days['death'][i]-days['death'][i-1])
 
+
+        days['predict']=list()
+        for i in range(0,4):
+            days['predict'].append(days['confirmed'][i])
+        for i in range(4,len(days['confirmed'])-1):
+            days['predict'].append(days['confirmed'][i]*0.15+days['confirmed'][i])
+
         info = {
             'confirmed': days['confirmed'][-1],
             'active': daily_df['active'].tolist()[-1],
@@ -203,10 +224,7 @@ def get_mohfw():
 
 
 def get_statewise(soup):
-    
-    table=soup.find('div',{'id':'cases'})
-    tbody=table.find('tbody')
-    trows=tbody.findAll('tr')
+    trows=soup.findAll('tr')
 
 
     state=list()
@@ -214,8 +232,8 @@ def get_statewise(soup):
     discharged=list()
     death=list()
     for row in trows:
-        for element in row(text=lambda text: isinstance(text, Comment)):
-            element.extract()
+       # for element in row(text=lambda text: isinstance(text, Comment)):
+            #element.extract()
         lst=row.find_all('td')
         if(len(lst)==5):
             try:
@@ -240,10 +258,12 @@ def get_statewise(soup):
     return statewise
 
 def get_info(soup):
-    counts=soup.findAll("span", {"class": "icount"})
-    info_labels=['passengers','infected','cured','death','migrated']
-    info_counts=[remove_html_tags(x) for x in counts]
-    info=dict(zip(info_labels,info_counts))
+    counts=soup.findAll("div", {"class": "site-stats-count"})
+    info = dict()
+    info['infected']=get_count(counts[0].findAll('li')[0].find('strong'))
+    info['cured']=get_count(counts[0].findAll('li')[1].find('strong'))
+    info['death']=get_count(counts[0].findAll('li')[2].find('strong'))
+    info['migrated']=get_count(counts[0].findAll('li')[3].find('strong'))
     info['source'] = 'mohfw'
 
     url="https://www.worldometers.info/coronavirus/country/india/"
