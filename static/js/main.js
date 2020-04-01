@@ -1,11 +1,90 @@
-Highcharts.chart('linecontainer', {
+
+
+function plotdailygraph()
+{
+
+    document.getElementById('daily-btn').style.backgroundColor="grey";
+    document.getElementById('cumulative-btn').style.background="#3fb1cb";
+    document.getElementById('cumulative-btn').disabled= false;
+    document.getElementById('daily-btn').disabled= true;
+
+    Highcharts.chart('linecontainer', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Corona India Timeline',
+        x:0,
+        y:80,
+        style: {
+            color: '#333333',
+            fontWeight: 'bold',
+            fontSize:'18px'
+        }
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'left',
+        verticalAlign: 'top',
+        x: 150,
+        y: 100,
+        floating: true,
+        borderWidth: 1,
+        backgroundColor:
+            Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
+    },
+    xAxis: {
+        categories:data.days.date,
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Cases'
+        }
+    },
+
+    tooltip: {
+        shared: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: [{
+        name: 'Confirmed',
+        data: data.days.confirmedincrease,
+        color: '#3498db' ,
+    }, {
+        name: 'Recovered',
+        data: data.days.recoveredincrease,
+        color: '#27ae60'
+
+    }, {
+        name: 'Death',
+        data: data.days.deathincrease,
+        color: '#34495e'
+    }]
+});
+}
+
+
+function plotcumulativegraph()
+{
+    document.getElementById('daily-btn').style.backgroundColor= "#3fb1cb";
+    document.getElementById('cumulative-btn').style.backgroundColor= "grey";
+    document.getElementById('cumulative-btn').disabled= true;
+    document.getElementById('daily-btn').disabled= false;
+    Highcharts.chart('linecontainer', {
     chart: {
         type: 'area'
     },
     title: {
         text: 'Corona India Timeline',
         x:0,
-        y:70,
+        y:85,
         style: {
             color: '#333333',
             fontWeight: 'bold',
@@ -26,9 +105,14 @@ Highcharts.chart('linecontainer', {
     xAxis: {
         categories: data.days.date,
         plotBands: [{
-            from: 4.5,
-            to: 6.5,
-            color: 'rgba(68, 170, 213, .2)'
+            from: 23,
+            to:data.days.date.length,
+            color: 'rgba(68, 170, 213, .2)',
+            label: { 
+            text: '21 days lockdown', // Content of the label. 
+            align: 'center', // Positioning of the label. 
+            //Default to center. x: +10 // Amount of pixels the label will be repositioned according to the alignment. 
+            }
         }]
     },
     yAxis: {
@@ -57,7 +141,13 @@ Highcharts.chart('linecontainer', {
             }
         },
     },
-    series: [{
+    series: [ 
+/*    {
+        name: '15% increase daily',
+        data: data.days.predict,
+        color: '#f7df1e'
+    },*/
+    {
         name: 'Confirmed Cases',
         data: data.days.confirmed,
         color: '#3498db'
@@ -73,6 +163,10 @@ Highcharts.chart('linecontainer', {
         color: '#34495e'
     }]
 });
+}
+
+plotcumulativegraph();
+
 Highcharts.chart('piecontainer', {
     chart: {
         type: 'pie',
