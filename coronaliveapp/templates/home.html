@@ -9,7 +9,7 @@
     <meta name="title" content="Coronavirus India Live Updates">
     <meta name="description" content="Coronavirus latest updates to track the spread of Coronavirus (COVID-19) in India">
     <meta name="keywords" content="coronavirus,corona,coronavirus in india,coronavirus india live,coronaindia,covid,covid19,pandemic,covidindia,india,virus">
-    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.8">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.9">
 </head>
 <body>
     <div class="main">
@@ -76,8 +76,8 @@
                 <figure class="highcharts-line">
                     <div id="linecontainer"></div>
                     <div class="btn-section">
-                        <button class="graphtype-btn" id="cumulative-btn" type="button" onclick="plotcumulativegraph()">Cumulative</button>
-                        <button class="graphtype-btn" id="daily-btn" type="button" onclick="plotdailygraph()">Daily</button>
+                        <button class="graphtype-btn" id="cumulative-btn" type="button" onclick="plotCumulativeGraph()">Cumulative</button>
+                        <button class="graphtype-btn" id="daily-btn" type="button" onclick="plotDailyGraph()">Daily</button>
                     </div>
                 </figure>
             </div>
@@ -104,8 +104,8 @@
 <script>
     var data = {{data}};
 </script>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="{% static 'js/main.js' %}?v=1.0.8"></script>
+<script defer src="https://code.highcharts.com/highcharts.js"></script>
+<script defer src="{% static 'js/main.js' %}?v=1.0.9"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-66396003-2"></script>
 <script>
     window.dataLayer = window.dataLayer || [];

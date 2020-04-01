@@ -18,33 +18,27 @@ body{
     min-width: 14.5%;
     padding: 10px;
     border-radius: 6px;
-    color: whitesmoke;
+    color: #fff;
     font-size: 15px;
     font-family: Arial, Helvetica, sans-serif;
 }
-
 .btn-section {
-    margin-left: 103px;
-    margin-top: 20px;
+    margin-left: 60px;
 }
-
 .graphtype-btn {
-    transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    color: white;
-    font-size: 16px;
-    padding: 8px 22px;
+    color: #fff;
+    font-size: 14px;
+    padding: 6px;
     border: none;
     cursor: pointer;
     border-radius: 5px;
     text-align: center;
-    width: 112px;
+    width: 100px;
 }
-
 .graphtype-btn:hover {
     background-color: purple;
-    color: white;
-    }
+    color: #fff;
+}
 .right {
     display: flex;
 }
@@ -59,7 +53,6 @@ body{
     background-image: linear-gradient(to right, #48d583,#1c7943);
 }
 #active-box {
-    
     background-image: linear-gradient(to right,#2790d7,#175681);
 }
 
@@ -72,7 +65,6 @@ body{
 #permillion-box {
     background-image: linear-gradient(to right,#59bbd3,#3fb1cb);
 }
-
 #confirmed-box {
     background-image: linear-gradient(to right,#ca538b,#7f2750);
 }
