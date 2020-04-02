@@ -92,6 +92,33 @@ figure{
 text.highcharts-credits {
     display: none;
 }
+
+.sources {
+    width: 200px;
+    margin: 100px auto 40px auto;
+}
+.source-title {
+    font-family: sans-serif;
+    font-size: 20px;
+    text-align: center;
+    margin: 5px;
+    margin-left: 29px; 
+}
+.our-sources {
+    display: flex;
+    flex-direction: row;
+}
+
+.source-link {
+    border: blue 1px solid;
+    border-radius: 22px;
+    text-decoration: none;
+    padding: 3px 5px;
+    font-size: 12px;
+    margin: 3px;
+}
+
+
 footer{
     background-color: #3498db;
     text-align: center;

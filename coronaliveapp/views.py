@@ -1,5 +1,5 @@
 
-import requests, json, re, urllib.request, time
+import requests, json, re, urllib.request, time, tweepy
 
 import pandas as pd
 from datetime import datetime, date
@@ -29,9 +29,12 @@ def home(req):
 
             #latest data
             latest = get_info(soup)
-            
+            updated = False
+
             try:
                 latest_rec = Daily.objects.get(date = date.today())
+                if int(latest['confirmed']) > latest_rec.confirmed:
+                    updated = True
                 latest_rec.confirmed = int(latest['confirmed'])
                 latest_rec.active = int(latest['infected'])
                 latest_rec.recovered = int(latest['cured'])
@@ -47,6 +50,12 @@ def home(req):
                     source = latest['source']
                 )
             latest_rec.save()
+
+            try:
+                if updated:
+                    tweet_update(latest)
+            except:
+                pass
 
             #daily data
             daily_df = pd.DataFrame(Daily.objects.all().values())
@@ -130,9 +139,11 @@ def adarsh(req):
         
         #latest data
         latest = get_info(soup)
-        
+        updated = False
         try:
             latest_rec = Daily.objects.get(date = date.today())
+            if int(latest['confirmed']) > latest_rec.confirmed:
+                updated = True
             latest_rec.confirmed = int(latest['confirmed'])
             latest_rec.active = int(latest['infected'])
             latest_rec.recovered = int(latest['cured'])
@@ -148,6 +159,14 @@ def adarsh(req):
                 source = latest['source']
             )
         latest_rec.save()
+
+
+        try:
+            if updated:
+                tweet_update(latest)
+        except:
+            pass
+
 
         #daily data
         daily_df = pd.DataFrame(Daily.objects.all().values())
@@ -374,3 +393,27 @@ def get_cache(key, expiry_time = None):
             return json.loads(cache.data)
     except Cache.DoesNotExist:
         pass
+
+def tweet_update(latest_data):
+    consumer_key ="o39SbBGOxeZ1pr10I0MjQJEgE"
+    consumer_secret ="WSBblqeUWcLnQ1seusYNRIZlttMLRrlOUGD09NpgyZ56FO01Dp"
+    access_token ="1245687086243438598-RwXIso7ltWLD7JtcInCpM1VTi3Rz6E"
+    access_token_secret ="9DPqdcuIIvhjWS4bd9oRxI869O4wpPdHdqbpi8uPIzOJS"
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret) 
+    auth.set_access_token(access_token, access_token_secret) 
+    api = tweepy.API(auth)
+    tweet = ("#coronavirusindia  update:\n\n"
+            "confirmed cases:  {}\n"
+            "active: {}\n"
+            "recovered: {}\n"
+            "deaths: {}\n\n"
+            "Know more: https://coronaindia.ml\n\n"
+            "#COVID #COVID19Pandemic "
+            "#coronaupdatesindia  #coronavirus "
+            "#COVID19outbreak".format(latest_data['confirmed'],latest_data['infected'],latest_data['cured'],latest_data['death']))
+    api.update_status(status =tweet)
+ 
+def tweet(req):
+    data={'confirmed':2069,'infected':1860,'cured':155,'death':53}
+    tweet_update(data)
+    return HttpResponse('<h1>pong</h1>')
