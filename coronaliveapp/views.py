@@ -9,7 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.utils.safestring import mark_safe
 from django.shortcuts import render
 from django.utils import timezone
-
+import config
 from corona.models import Cache, Daily
 
 #route functions
@@ -51,11 +51,11 @@ def home(req):
                 )
             latest_rec.save()
 
-            try:
-                if updated:
-                    tweet_update(latest)
-            except:
-                pass
+            #try:
+            #    if updated:
+            #        tweet_update(latest)
+            #except:
+            #    pass
 
             #daily data
             daily_df = pd.DataFrame(Daily.objects.all().values())
@@ -394,11 +394,9 @@ def get_cache(key, expiry_time = None):
     except Cache.DoesNotExist:
         pass
 
+"""
 def tweet_update(latest_data):
-    consumer_key ="o39SbBGOxeZ1pr10I0MjQJEgE"
-    consumer_secret ="WSBblqeUWcLnQ1seusYNRIZlttMLRrlOUGD09NpgyZ56FO01Dp"
-    access_token ="1245687086243438598-RwXIso7ltWLD7JtcInCpM1VTi3Rz6E"
-    access_token_secret ="9DPqdcuIIvhjWS4bd9oRxI869O4wpPdHdqbpi8uPIzOJS"
+
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret) 
     auth.set_access_token(access_token, access_token_secret) 
     api = tweepy.API(auth)
@@ -412,7 +410,7 @@ def tweet_update(latest_data):
             "#coronaupdatesindia  #coronavirus "
             "#COVID19outbreak".format(latest_data['confirmed'],latest_data['infected'],latest_data['cured'],latest_data['death']))
     api.update_status(status =tweet)
- 
+ """
 def tweet(req):
     data={'confirmed':2069,'infected':1860,'cured':155,'death':53}
     tweet_update(data)
