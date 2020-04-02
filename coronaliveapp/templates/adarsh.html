@@ -9,29 +9,31 @@
     <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.8">
     <style>
 
-        .whobtn-section {
-            margin: 30px;
-            display: flex;
-            justify-content: space-evenly;
+
+        .sources {
+            width: 200px;
+            margin: 100px auto 40px auto;
         }
-        .who-btn {
-            transform: translate(-50%, -50%);
-            -ms-transform: translate(-50%, -50%);
-            color: black;
-            font-size: 16px;
-            padding: 8px 22px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
+        .source-title {
+            font-family: sans-serif;
+            font-size: 20px;
             text-align: center;
-            width: 112px;
+            margin: 5px;
+            margin-left: 29px; 
+        }
+        .our-sources {
+            display: flex;
+            flex-direction: row;
         }
 
-        .who-btn:hover {
-            background-color: skyblue;
-            color: white;
-            }
-
+        .source-link {
+            border: blue 1px solid;
+            border-radius: 22px;
+            text-decoration: none;
+            padding: 3px 5px;
+            font-size: 12px;
+            margin: 3px;
+        }
 
         table {
         font-family: arial, sans-serif;
@@ -151,13 +153,15 @@
             </table>
         </div>
     </div>
-
-    <div class="whobtn-section">
-        <button class="who-btn">Daily</button>
-        <button class="who-btn">Daily</button>
-        <button class="who-btn">Daily</button>
-        <button class="who-btn">Daily</button>
+    <div class="sources">
+        <div class="source-title">Our Sources:</div>
+        <div class="our-sources">
+            <a class="source-link" href="https://www.mohfw.gov.in/">MoHFW</a>
+            <a class="source-link" href="https://www.worldometers.info/coronavirus/country/india/">Worldometers</a>
+            <a class="source-link" href="https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_India">Wikipedia</a>
+        </div>
     </div>
+
 
     <footer>
         <div>
