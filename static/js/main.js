@@ -1,10 +1,12 @@
+var d = document;
+
 function plotDailyGraph()
 {
 
-    document.getElementById('daily-btn').style.backgroundColor="grey";
-    document.getElementById('cumulative-btn').style.background="#3fb1cb";
-    document.getElementById('cumulative-btn').disabled= false;
-    document.getElementById('daily-btn').disabled= true;
+    d.getElementById('daily-btn').style.backgroundColor="grey";
+    d.getElementById('cumulative-btn').style.background="#3fb1cb";
+    d.getElementById('cumulative-btn').disabled= false;
+    d.getElementById('daily-btn').disabled= true;
 
     Highcharts.chart('linecontainer', {
         chart: {
@@ -70,10 +72,10 @@ function plotDailyGraph()
 
 function plotCumulativeGraph()
 {
-    document.getElementById('daily-btn').style.backgroundColor= "#3fb1cb";
-    document.getElementById('cumulative-btn').style.backgroundColor= "grey";
-    document.getElementById('cumulative-btn').disabled= true;
-    document.getElementById('daily-btn').disabled= false;
+    d.getElementById('daily-btn').style.backgroundColor= "#3fb1cb";
+    d.getElementById('cumulative-btn').style.backgroundColor= "grey";
+    d.getElementById('cumulative-btn').disabled= true;
+    d.getElementById('daily-btn').disabled= false;
 
     Highcharts.chart('linecontainer', {
         chart: {
@@ -163,12 +165,20 @@ function plotCumulativeGraph()
     });
 }
 
+function showBtns() {
+    d.getElementsByClassName('btn-section')[0].style.display = 'block';
+}
+
 plotCumulativeGraph();
+ 
 
 Highcharts.chart('piecontainer', {
     chart: {
         type: 'pie',
-        height: 270
+        height: 270,
+        events: {
+            load: showBtns
+        }
     },
     title: {
         text: data.info.confirmed+' cases',
