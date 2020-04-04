@@ -9,7 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.utils.safestring import mark_safe
 from django.shortcuts import render
 from django.utils import timezone
-import config
+from coronaliveapp.config import CONFIG
 from corona.models import Cache, Daily
 
 #route functions
@@ -394,8 +394,13 @@ def get_cache(key, expiry_time = None):
     except Cache.DoesNotExist:
         pass
 
-"""
+
 def tweet_update(latest_data):
+
+    consumer_key = CONFIG['consumer_key']
+    consumer_secret = CONFIG['consumer_secret']
+    access_token = CONFIG['access_token']
+    access_token_secret = CONFIG['access_token_secret']
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret) 
     auth.set_access_token(access_token, access_token_secret) 
@@ -410,8 +415,10 @@ def tweet_update(latest_data):
             "#coronaupdatesindia  #coronavirus "
             "#COVID19outbreak".format(latest_data['confirmed'],latest_data['infected'],latest_data['cured'],latest_data['death']))
     api.update_status(status =tweet)
- """
+
+"""
 def tweet(req):
     data={'confirmed':2069,'infected':1860,'cured':155,'death':53}
     tweet_update(data)
     return HttpResponse('<h1>pong</h1>')
+"""

@@ -20,6 +20,5 @@ from coronaliveapp import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ping/', views.ping),
-    path('', views.home, name='home'),
-    #path('adarsh/', views.adarsh)
+    path('', views.home, name='home')
 ]
