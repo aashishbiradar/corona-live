@@ -51,11 +51,11 @@ def home(req):
                 )
             latest_rec.save()
 
-            #try:
-            #    if updated:
-            #        tweet_update(latest)
-            #except:
-            #    pass
+            try:
+                if updated:
+                    tweet_update(latest)
+            except:
+                pass
 
             #daily data
             daily_df = pd.DataFrame(Daily.objects.all().values())
@@ -159,7 +159,6 @@ def adarsh(req):
                 source = latest['source']
             )
         latest_rec.save()
-
 
         try:
             if updated:
@@ -416,9 +415,8 @@ def tweet_update(latest_data):
             "#COVID19outbreak".format(latest_data['confirmed'],latest_data['infected'],latest_data['cured'],latest_data['death']))
     api.update_status(status =tweet)
 
-"""
+
 def tweet(req):
     data={'confirmed':2069,'infected':1860,'cured':155,'death':53}
     tweet_update(data)
     return HttpResponse('<h1>pong</h1>')
-"""
