@@ -12,6 +12,8 @@ from django.utils import timezone
 from coronaliveapp.config import CONFIG
 from corona.models import Cache, Daily
 
+from django.urls import reverse
+
 #route functions
 def home(req):
     t1 = time.time()
@@ -214,140 +216,28 @@ def adarsh(req):
         'dict': cached_data
     })
 
-def karnataka(req):
+def stateupdate(req):
     t1 = time.time()
-    cache_key = 'karnataka'
-    expiry = 5 
-    cached_data = get_cache(cache_key, expiry)
-    from_cache= 'true'
+
+    state_details = get_statename(str(reverse(viewname='stateupdate')))
+
+    data = get_state_data(state_details[0],state_details[1])    
+    from_cache= 'false'
     
-    if True or not cached_data:
-        url = 'https://api.covid19india.org/data.json'
-        country_json = requests.get(url).json()
-
-        statewise_dataframe = pd.DataFrame(country_json['statewise'])
-
-        present_data = statewise_dataframe[statewise_dataframe['state']=='Karnataka']
-
-        info = {
-            'active' : int(present_data['active'].sum()),
-            'confirmed' : int(present_data['confirmed'].sum()),
-            'death' : int(present_data['deaths'].sum()),
-            'recovered' : int(present_data['recovered'].sum())
-        }           
-
-        state_daily_url = "https://api.covid19india.org/states_daily.json"
-
-        statewise_timeline = requests.get(state_daily_url).json()
-        changes = statewise_timeline['states_daily']
-
-
-        dates = []
-        for change in changes:
-            if(change['status']=='Confirmed'):
-                dates.append(change['date'])
-        dates.append('5-Apr-20')
-
-        confirmedincrease = []
-        for change in changes:
-            if(change['status']=='Confirmed'):
-                confirmedincrease.append(int(change['ka']))
-        confirmedincrease.append(info['confirmed']-sum(confirmedincrease))
-
-        recoveredincrease = []
-        for change in changes:
-            if(change['status']=='Recovered'):
-                recoveredincrease.append(int(change['ka']))
-        recoveredincrease.append(info['recovered']-sum(recoveredincrease))
-
-        deathincrease = []
-        for change in changes:
-            if(change['status']=='Deceased'):
-                deathincrease.append(int(change['ka']))
-        deathincrease.append(info['death']-sum(deathincrease))
-
-
-
-
-        confirmed = []
-
-        for i in range(1,len(confirmedincrease)+1):
-            confirmed.append(sum(confirmedincrease[0:i]))
-        
-
-        recovered = []
-
-        for i in range(1,len(recoveredincrease)+1):
-            recovered.append(sum(recoveredincrease[0:i]))
-
-        death = []
-
-        for i in range(1,len(deathincrease)+1):
-            death.append(sum(deathincrease[0:i]))
-
-        active = [confirmed[i]-recovered[i]-death[i] for i in range(len(confirmed))]
-        activeincrease = [active[0]]
-
-        for i in range(1,len(active)):
-            activeincrease.append(active[i]-active[i-1])
-
-
-        days = {
-            'date' : dates,
-            'confirmed' : confirmed,
-            'recovered' : recovered,
-            'death' : death,
-            'active' : active,
-            'confirmedincrease' : confirmedincrease,
-            'recoveredincrease' : recoveredincrease,
-            'deathincrease' : deathincrease,
-            'activeincrease' : activeincrease
-        }
-
-        statewise_json_url = 'https://api.covid19india.org/state_district_wise.json'
-
-        statewise_json = requests.get(statewise_json_url).json()
-
-        karnataka=statewise_json['Karnataka']
-
-        state = []
-        confirmed = []
-
-        for district in karnataka['districtData']:
-            state.append(district)
-            confirmed.append(karnataka['districtData'][district]['confirmed'])
-
-        statewise = {
-            'state' : state,
-            'active' : confirmed   
-        }
-
-        tests={1:1,2:2}
-
-        cached_data = {
-            'statewise': statewise,
-            'info': info,
-            'days': days,
-            'tests': tests
-        }
-
-        save_cache(cache_key, cached_data)
-        from_cache= 'false'
-
-
-
     t2 = time.time()
     compute = t2-t1
-    return render(req,'adarsh.html',{
-    'data': mark_safe(json.dumps(cached_data)),
-    'compute': compute,
-    'from_cache': from_cache,
-    'dict': cached_data
-})
+    
+    return render(req,'districtwise.html',{
+        'data': mark_safe(json.dumps(data)),
+        'compute': compute,
+        'from_cache': from_cache,
+        'dict': data
+    })
 
 
 def ping(req):
-    return HttpResponse('<h1>pong</h1>')
+    path = str(reverse(viewname='ping'))
+    return HttpResponse('<h1>pong: '+ path +'</h1>')
 
 #services
 def get_mohfw():
@@ -545,11 +435,16 @@ def tweet(req):
 
 def get_state_data(state_name,state_code):
     url = 'https://api.covid19india.org/data.json'
+    state_daily_url = "https://api.covid19india.org/states_daily.json"
+    statewise_json_url = 'https://api.covid19india.org/state_district_wise.json'
+
+
+
     country_json = requests.get(url).json()
 
     statewise_dataframe = pd.DataFrame(country_json['statewise'])
 
-    present_data = statewise_dataframe[statewise_dataframe['state']=='Karnataka']
+    present_data = statewise_dataframe[statewise_dataframe['state']== state_name]
 
     info = {
         'active' : int(present_data['active'].sum()),
@@ -558,7 +453,7 @@ def get_state_data(state_name,state_code):
         'recovered' : int(present_data['recovered'].sum())
     }           
 
-    state_daily_url = "https://api.covid19india.org/states_daily.json"
+
 
     statewise_timeline = requests.get(state_daily_url).json()
     changes = statewise_timeline['states_daily']
@@ -568,44 +463,32 @@ def get_state_data(state_name,state_code):
     for change in changes:
         if(change['status']=='Confirmed'):
             dates.append(change['date'])
-    dates.append('13-Mar-20')
+    dates.append('5-Apr-20')
 
     confirmedincrease = []
+    recoveredincrease = []
+    deathincrease = []
+    confirmed = []
+    recovered = []
+    death = []
+    
+    
     for change in changes:
         if(change['status']=='Confirmed'):
-            confirmedincrease.append(int(change['ka']))
-    confirmedincrease.append(info['confirmed']-sum(confirmedincrease))
-
-    recoveredincrease = []
-    for change in changes:
+            confirmedincrease.append(int(change[state_code]))
         if(change['status']=='Recovered'):
-            recoveredincrease.append(int(change['ka']))
-    recoveredincrease.append(info['recovered']-sum(recoveredincrease))
-
-    deathincrease = []
-    for change in changes:
+            recoveredincrease.append(int(change[state_code])) 
         if(change['status']=='Deceased'):
-            deathincrease.append(int(change['ka']))
+            deathincrease.append(int(change[state_code]))
+    confirmedincrease.append(info['confirmed']-sum(confirmedincrease))
+    recoveredincrease.append(info['recovered']-sum(recoveredincrease))
     deathincrease.append(info['death']-sum(deathincrease))
-
-
-
-
-    confirmed = []
 
     for i in range(1,len(confirmedincrease)+1):
         confirmed.append(sum(confirmedincrease[0:i]))
-    
-
-    recovered = []
-
-    for i in range(1,len(recoveredincrease)+1):
         recovered.append(sum(recoveredincrease[0:i]))
-
-    death = []
-
-    for i in range(1,len(deathincrease)+1):
         death.append(sum(deathincrease[0:i]))
+
 
     active = [confirmed[i]-recovered[i]-death[i] for i in range(len(confirmed))]
     activeincrease = [active[0]]
@@ -626,11 +509,10 @@ def get_state_data(state_name,state_code):
         'activeincrease' : activeincrease
     }
 
-    statewise_json_url = 'https://api.covid19india.org/state_district_wise.json'
 
     statewise_json = requests.get(statewise_json_url).json()
 
-    karnataka=statewise_json['Karnataka']
+    karnataka=statewise_json[state_name]
 
     state = []
     confirmed = []
@@ -639,9 +521,14 @@ def get_state_data(state_name,state_code):
         state.append(district)
         confirmed.append(karnataka['districtData'][district]['confirmed'])
 
+
+    data=pd.DataFrame(zip(state,confirmed),columns=['state','confirmed'])
+    data.sort_values(by=['confirmed'],axis=0,inplace=True,ascending=False)
+
+
     statewise = {
-        'state' : state,
-        'active' : confirmed   
+        'state' : data['state'].tolist(),
+        'active' : data['confirmed'].tolist()
     }
 
     tests={1:1,2:2}
@@ -656,3 +543,23 @@ def get_state_data(state_name,state_code):
     return data
 
     
+
+
+def get_statename(text):
+    
+
+    url = 'https://api.covid19india.org/data.json'
+    country_json = requests.get(url).json()
+
+
+    statewise_dataframe = pd.DataFrame(country_json['statewise'])
+    
+    states = statewise_dataframe['state'].tolist()
+    statecode = statewise_dataframe['statecode'].apply(str.lower).tolist()
+
+    details = dict(zip(states,statecode))
+    text = str(text)
+    state = (re.findall(r'\w+', text)[0])
+    lst = [state,details[state]]
+    print(lst)
+    return lst
