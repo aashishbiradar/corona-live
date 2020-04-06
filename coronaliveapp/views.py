@@ -132,83 +132,67 @@ def adarsh(req):
     from_cache= 'true'
 
     if True or not cached_data:
-        soup=get_mohfw()
-        statewise=get_statewise(soup)
-        wiki=get_wiki()
-        tests=get_tests(wiki)
-        
-        #latest data
-        latest = get_info(soup)
-        updated = False
-        try:
-            latest_rec = Daily.objects.get(date = date.today())
-            if int(latest['confirmed']) > latest_rec.confirmed:
-                updated = True
-            latest_rec.confirmed = int(latest['confirmed'])
-            latest_rec.active = int(latest['infected'])
-            latest_rec.recovered = int(latest['cured'])
-            latest_rec.death = int(latest['death'])
-            latest_rec.source = latest['source']
-        except Daily.DoesNotExist:
-            latest_rec = Daily(
-                date = date.today(),
-                confirmed = int(latest['confirmed']),
-                active = int(latest['infected']),
-                recovered = int(latest['cured']),
-                death = int(latest['death']),
-                source = latest['source']
-            )
-        latest_rec.save()
-
-        try:
-            if updated:
-                tweet_update(latest)
-        except:
-            pass
 
 
-        #daily data
-        daily_df = pd.DataFrame(Daily.objects.all().values())
-        daily_df['date'] = pd.to_datetime(daily_df['date'])
-        daily_df.sort_values(by=['date'],inplace=True)
-        daily_df['date'] = daily_df['date'].dt.strftime('%b %d')
-        
-        days = {
-            'date': daily_df['date'].tolist(),
-            'confirmed': daily_df['confirmed'].tolist(),
-            'recovered': daily_df['recovered'].tolist(),
-            'death': daily_df['death'].tolist()
-        }
-        days['confirmedincrease']=[days['confirmed'][0]]
-        days['recoveredincrease']=[days['recovered'][0]]
-        days['deathincrease']=[days['death'][0]]
-        for i in range(1,len(days['confirmed'])):
-            days['confirmedincrease'].append(days['confirmed'][i]-days['confirmed'][i-1])
-            days['recoveredincrease'].append(days['recovered'][i]-days['recovered'][i-1])
-            days['deathincrease'].append(days['death'][i]-days['death'][i-1])
+
+        url = 'https://api.covid19india.org/data.json'
+        country_json = requests.get(url).json()
 
 
-        days['predict']=list()
-        for i in range(0,4):
-            days['predict'].append(days['confirmed'][i])
-        for i in range(4,len(days['confirmed'])-1):
-            days['predict'].append(days['confirmed'][i]*0.15+days['confirmed'][i])
+        statewise_dataframe = pd.DataFrame(country_json['statewise'])
+
+        present_data = statewise_dataframe[statewise_dataframe['state']=='Total']
 
         info = {
-            'confirmed': days['confirmed'][-1],
-            'active': daily_df['active'].tolist()[-1],
-            'recovered': days['recovered'][-1],
-            'death': days['death'][-1],
-            'diffconfirmed': days['confirmed'][-1]-days['confirmed'][-2],
-            'diffactive': daily_df['active'].tolist()[-1]-daily_df['active'].tolist()[-2],
-            'diffrecovered': days['recovered'][-1]-days['recovered'][-2],
-            'diffdeath': days['death'][-1]-days['death'][-2]
+            'active' : int(present_data['active'].sum()),
+            'confirmed' : int(present_data['confirmed'].sum()),
+            'death' : int(present_data['deaths'].sum()),
+            'recovered' : int(present_data['recovered'].sum())
         }
 
-        info['percentageconfirmed']=round(info['diffconfirmed']*100/days['confirmed'][-2])
-        info['percentageactive']=round(info['diffactive']*100/daily_df['active'].tolist()[-2])
-        info['percentagerecovered']=round(info['diffrecovered']*100/days['recovered'][-2])
-        info['percentagedeath']=round(info['diffdeath']*100/days['death'][-2])
+
+        statewise_dataframe = statewise_dataframe[1:]
+        statewise_dataframe = statewise_dataframe[statewise_dataframe['confirmed']!='0']
+
+
+        
+
+        statewise = {
+            'state' : statewise_dataframe['state'].tolist(),
+            'statecode' : statewise_dataframe['statecode'].apply(str.lower).tolist(),
+            'active' : statewise_dataframe['active'].apply(int).tolist(),
+            'confirmed':statewise_dataframe['confirmed'].apply(int).tolist(),
+            'death' : statewise_dataframe['deaths'].apply(int).tolist(),
+            'discharged' : statewise_dataframe['recovered'].apply(int).tolist()
+        }
+
+        daily_dataframe = pd.DataFrame(country_json['cases_time_series'])
+
+        days = {
+            'date' : daily_dataframe['date'].tolist(),
+            'confirmed' : daily_dataframe['totalconfirmed'].apply(int).tolist(),
+            'recovered' : daily_dataframe['totalrecovered'].apply(int).tolist(),
+            'death' : daily_dataframe['totaldeceased'].apply(int).tolist(),
+            'confirmedincrease' : daily_dataframe['dailyconfirmed'].apply(int).tolist(),
+            'recoveredincrease' : daily_dataframe['dailyrecovered'].apply(int).tolist(),
+            'deathincrease' : daily_dataframe['dailydeceased'].apply(int).tolist()
+        }
+
+        previous_day_active=days['confirmed'][-1]-days['recovered'][-1]-days['death'][-1]
+
+
+        info['diffconfirmed'] = info['confirmed']-days['confirmed'][-1]
+        info['diffactive'] = info['active']-previous_day_active
+        info['diffrecovered'] = info['recovered']-days['recovered'][-1]
+        info['diffdeath'] = info['death']-days['death'][-1]
+        if(info['diffdeath']<0):
+            info['diffdeath']=0
+        info['percentageconfirmed']=round(info['diffconfirmed']*100/days['confirmed'][-1])
+        info['percentageactive']=round(info['diffactive']*100/previous_day_active)
+        info['percentagerecovered']=round(info['diffrecovered']*100/days['recovered'][-1])
+        info['percentagedeath']=round(info['diffdeath']*100/days['death'][-1])
+
+        tests={1:1,2:2}
 
         cached_data = {
             'statewise': statewise,
@@ -229,6 +213,138 @@ def adarsh(req):
         'from_cache': from_cache,
         'dict': cached_data
     })
+
+def karnataka(req):
+    t1 = time.time()
+    cache_key = 'karnataka'
+    expiry = 5 
+    cached_data = get_cache(cache_key, expiry)
+    from_cache= 'true'
+    
+    if True or not cached_data:
+        url = 'https://api.covid19india.org/data.json'
+        country_json = requests.get(url).json()
+
+        statewise_dataframe = pd.DataFrame(country_json['statewise'])
+
+        present_data = statewise_dataframe[statewise_dataframe['state']=='Karnataka']
+
+        info = {
+            'active' : int(present_data['active'].sum()),
+            'confirmed' : int(present_data['confirmed'].sum()),
+            'death' : int(present_data['deaths'].sum()),
+            'recovered' : int(present_data['recovered'].sum())
+        }           
+
+        state_daily_url = "https://api.covid19india.org/states_daily.json"
+
+        statewise_timeline = requests.get(state_daily_url).json()
+        changes = statewise_timeline['states_daily']
+
+
+        dates = []
+        for change in changes:
+            if(change['status']=='Confirmed'):
+                dates.append(change['date'])
+        dates.append('5-Apr-20')
+
+        confirmedincrease = []
+        for change in changes:
+            if(change['status']=='Confirmed'):
+                confirmedincrease.append(int(change['ka']))
+        confirmedincrease.append(info['confirmed']-sum(confirmedincrease))
+
+        recoveredincrease = []
+        for change in changes:
+            if(change['status']=='Recovered'):
+                recoveredincrease.append(int(change['ka']))
+        recoveredincrease.append(info['recovered']-sum(recoveredincrease))
+
+        deathincrease = []
+        for change in changes:
+            if(change['status']=='Deceased'):
+                deathincrease.append(int(change['ka']))
+        deathincrease.append(info['death']-sum(deathincrease))
+
+
+
+
+        confirmed = []
+
+        for i in range(1,len(confirmedincrease)+1):
+            confirmed.append(sum(confirmedincrease[0:i]))
+        
+
+        recovered = []
+
+        for i in range(1,len(recoveredincrease)+1):
+            recovered.append(sum(recoveredincrease[0:i]))
+
+        death = []
+
+        for i in range(1,len(deathincrease)+1):
+            death.append(sum(deathincrease[0:i]))
+
+        active = [confirmed[i]-recovered[i]-death[i] for i in range(len(confirmed))]
+        activeincrease = [active[0]]
+
+        for i in range(1,len(active)):
+            activeincrease.append(active[i]-active[i-1])
+
+
+        days = {
+            'date' : dates,
+            'confirmed' : confirmed,
+            'recovered' : recovered,
+            'death' : death,
+            'active' : active,
+            'confirmedincrease' : confirmedincrease,
+            'recoveredincrease' : recoveredincrease,
+            'deathincrease' : deathincrease,
+            'activeincrease' : activeincrease
+        }
+
+        statewise_json_url = 'https://api.covid19india.org/state_district_wise.json'
+
+        statewise_json = requests.get(statewise_json_url).json()
+
+        karnataka=statewise_json['Karnataka']
+
+        state = []
+        confirmed = []
+
+        for district in karnataka['districtData']:
+            state.append(district)
+            confirmed.append(karnataka['districtData'][district]['confirmed'])
+
+        statewise = {
+            'state' : state,
+            'active' : confirmed   
+        }
+
+        tests={1:1,2:2}
+
+        cached_data = {
+            'statewise': statewise,
+            'info': info,
+            'days': days,
+            'tests': tests
+        }
+
+        save_cache(cache_key, cached_data)
+        from_cache= 'false'
+
+
+
+    t2 = time.time()
+    compute = t2-t1
+    return render(req,'adarsh.html',{
+    'data': mark_safe(json.dumps(cached_data)),
+    'compute': compute,
+    'from_cache': from_cache,
+    'dict': cached_data
+})
+
 
 def ping(req):
     return HttpResponse('<h1>pong</h1>')
@@ -420,3 +536,123 @@ def tweet(req):
     data={'confirmed':2069,'infected':1860,'cured':155,'death':53}
     tweet_update(data)
     return HttpResponse('<h1>pong</h1>')
+
+
+
+
+
+
+
+def get_state_data(state_name,state_code):
+    url = 'https://api.covid19india.org/data.json'
+    country_json = requests.get(url).json()
+
+    statewise_dataframe = pd.DataFrame(country_json['statewise'])
+
+    present_data = statewise_dataframe[statewise_dataframe['state']=='Karnataka']
+
+    info = {
+        'active' : int(present_data['active'].sum()),
+        'confirmed' : int(present_data['confirmed'].sum()),
+        'death' : int(present_data['deaths'].sum()),
+        'recovered' : int(present_data['recovered'].sum())
+    }           
+
+    state_daily_url = "https://api.covid19india.org/states_daily.json"
+
+    statewise_timeline = requests.get(state_daily_url).json()
+    changes = statewise_timeline['states_daily']
+
+
+    dates = []
+    for change in changes:
+        if(change['status']=='Confirmed'):
+            dates.append(change['date'])
+    dates.append('13-Mar-20')
+
+    confirmedincrease = []
+    for change in changes:
+        if(change['status']=='Confirmed'):
+            confirmedincrease.append(int(change['ka']))
+    confirmedincrease.append(info['confirmed']-sum(confirmedincrease))
+
+    recoveredincrease = []
+    for change in changes:
+        if(change['status']=='Recovered'):
+            recoveredincrease.append(int(change['ka']))
+    recoveredincrease.append(info['recovered']-sum(recoveredincrease))
+
+    deathincrease = []
+    for change in changes:
+        if(change['status']=='Deceased'):
+            deathincrease.append(int(change['ka']))
+    deathincrease.append(info['death']-sum(deathincrease))
+
+
+
+
+    confirmed = []
+
+    for i in range(1,len(confirmedincrease)+1):
+        confirmed.append(sum(confirmedincrease[0:i]))
+    
+
+    recovered = []
+
+    for i in range(1,len(recoveredincrease)+1):
+        recovered.append(sum(recoveredincrease[0:i]))
+
+    death = []
+
+    for i in range(1,len(deathincrease)+1):
+        death.append(sum(deathincrease[0:i]))
+
+    active = [confirmed[i]-recovered[i]-death[i] for i in range(len(confirmed))]
+    activeincrease = [active[0]]
+
+    for i in range(1,len(active)):
+        activeincrease.append(active[i]-active[i-1])
+
+
+    days = {
+        'date' : dates,
+        'confirmed' : confirmed,
+        'recovered' : recovered,
+        'death' : death,
+        'active' : active,
+        'confirmedincrease' : confirmedincrease,
+        'recoveredincrease' : recoveredincrease,
+        'deathincrease' : deathincrease,
+        'activeincrease' : activeincrease
+    }
+
+    statewise_json_url = 'https://api.covid19india.org/state_district_wise.json'
+
+    statewise_json = requests.get(statewise_json_url).json()
+
+    karnataka=statewise_json['Karnataka']
+
+    state = []
+    confirmed = []
+
+    for district in karnataka['districtData']:
+        state.append(district)
+        confirmed.append(karnataka['districtData'][district]['confirmed'])
+
+    statewise = {
+        'state' : state,
+        'active' : confirmed   
+    }
+
+    tests={1:1,2:2}
+
+    data = {
+        'statewise': statewise,
+        'info': info,
+        'days': days,
+        'tests': tests
+    }
+
+    return data
+
+    
