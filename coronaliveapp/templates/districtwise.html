@@ -24,16 +24,6 @@
             display: flex;
             flex-direction: row;
         }
-        .statewise-links {
-            text-decoration: none;
-            color : black;
-
-            font-size: 15px;
-        }
-        .statewise-links:hover {
-
-            font-size: 16px;
-        }
 
         .source-link {
             border: #3498DB 1.5px solid;
@@ -151,11 +141,8 @@
             <table id="statewise-table">
                 <thead>
                     <tr>
-                     <th>State</th>
+                     <th>District</th>
                      <th>Confirmed</th>
-                     <th>Active</th>
-                     <th>Recovered</th>
-                     <th>Death</th>
                    </tr>
                 </thead>
                 <tbody id='statewise-tbody'>
@@ -198,27 +185,17 @@
     for (let i in a) {
         a[i] = Math.ceil(a[i]);
     }
-   
 */
+
     for (i = 0; i < data.statewise.state.length; i++) 
     {
         var table=document.getElementById('statewise-tbody');
         var row=table.insertRow(i);
         var state=row.insertCell(0);
         var confirmed=row.insertCell(1)
-        var active=row.insertCell(2);
-        var recovered=row.insertCell(3);
-        var death=row.insertCell(4);
-        confirmed.innerHTML=data.statewise.confirmed[i];
-        var state_name = data.statewise.state[i]
-        var state_lower = state_name.toLowerCase().split(" ").join("");
-        state.innerHTML='<a class="statewise-links" href="https://www.coronaindia.ml/'+state_lower+'-state-corona-update">'+ state_name +'</a>'
-        active.innerHTML=data.statewise.active[i];
-        recovered.innerHTML=data.statewise.discharged[i];
-        death.innerHTML=data.statewise.death[i]; 
-
+        confirmed.innerHTML=data.statewise.active[i];
+        state.innerHTML=data.statewise.state[i];
     }
-
 function plotdailygraph()
 {
 
@@ -360,26 +337,23 @@ function plotcumulativegraph()
             }
         },
     },
-    series: [ /*{
-        name: '18% increase daily',
-        data: a,
-        color: '#f7df1e'
-    },*/
+    series: [ 
     {
-        name: 'Confirmed Cases',
+        name: 'Confirmed',
         data: data.days.confirmed,
         color: '#3498db'
     },
     {
         name: 'Recovered',
         data: data.days.recovered,
-        color: '#27ae60'
+        color: '#2ecc71'
     },
     {
-        name: 'Deaths',
+        name: 'Death',
         data: data.days.death,
         color: '#34495e'
-    }]
+    }
+    ]
 });
 }
 
@@ -443,7 +417,7 @@ Highcharts.chart('container', {
         type: 'bar'
     },
     title: {
-        text: 'Statewise Corona Cases',
+        text: 'Districtwise Corona Cases',
         style: {
             color: '#333333',
             fontWeight: 'bold',
@@ -461,7 +435,7 @@ Highcharts.chart('container', {
 
     },
     legend: {
-        reversed: true
+        reversed: true,
     },
     plotOptions: {
         series: {
@@ -469,17 +443,9 @@ Highcharts.chart('container', {
         }
     },
     series: [{
-        name: 'Active',
+        name: 'Confirmed',
         data: data.statewise.active,
         color: '#3498db'
-    },{
-        name: 'Recovered',
-        data: data.statewise.discharged,
-        color: '#2ecc71'
-    }, {
-        name: 'Death',
-        data: data.statewise.death,
-        color: '#34495e'
     }]
 });
 </script>

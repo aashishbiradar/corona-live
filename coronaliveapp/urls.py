@@ -22,6 +22,6 @@ urlpatterns = [
     re_path(r'^[\w]+-abc-bde/', views.ping, name='ping'),
     path('', views.home, name='home'),
     path('adarsh/', views.adarsh),
-    re_path(r'^[\w]+-state-update/',views.stateupdate, name='stateupdate')
+    re_path(r'^[\w]+-state-corona-update/',views.stateupdate, name='stateupdate')
 
 ]

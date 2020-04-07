@@ -180,20 +180,10 @@ def adarsh(req):
             'deathincrease' : daily_dataframe['dailydeceased'].apply(int).tolist()
         }
 
-        previous_day_active=days['confirmed'][-1]-days['recovered'][-1]-days['death'][-1]
+        
+        info = get_info_details(info,days)
 
-
-        info['diffconfirmed'] = info['confirmed']-days['confirmed'][-1]
-        info['diffactive'] = info['active']-previous_day_active
-        info['diffrecovered'] = info['recovered']-days['recovered'][-1]
-        info['diffdeath'] = info['death']-days['death'][-1]
-        if(info['diffdeath']<0):
-            info['diffdeath']=0
-        info['percentageconfirmed']=round(info['diffconfirmed']*100/days['confirmed'][-1])
-        info['percentageactive']=round(info['diffactive']*100/previous_day_active)
-        info['percentagerecovered']=round(info['diffrecovered']*100/days['recovered'][-1])
-        info['percentagedeath']=round(info['diffdeath']*100/days['death'][-1])
-
+        
         tests={1:1,2:2}
 
         cached_data = {
@@ -219,7 +209,7 @@ def adarsh(req):
 def stateupdate(req):
     t1 = time.time()
 
-    state_details = get_statename(str(reverse(viewname='stateupdate')))
+    state_details = get_statename(req.META['RAW_URI'])
 
     data = get_state_data(state_details[0],state_details[1])    
     from_cache= 'false'
@@ -236,8 +226,10 @@ def stateupdate(req):
 
 
 def ping(req):
-    path = str(reverse(viewname='ping'))
-    return HttpResponse('<h1>pong: '+ path +'</h1>')
+    meta = req.META['RAW_URI']
+    #js = json.dumps(meta)
+    #path = str(reverse(viewname='ping'))
+    return HttpResponse('<h1>pong: '+ meta +'</h1>')
 
 #services
 def get_mohfw():
@@ -379,8 +371,11 @@ def remove_html_tags(text):
 
 def get_count(text):
     text=str(text).replace(",","")
-    num=int(re.findall(r'\d+', text)[0])
-    return num
+    try:
+        num=int(re.findall(r'\d+', text)[0])
+        return num
+    except :
+        return 0
 
 def save_cache(key,data):
     try:
@@ -463,7 +458,6 @@ def get_state_data(state_name,state_code):
     for change in changes:
         if(change['status']=='Confirmed'):
             dates.append(change['date'])
-    dates.append('5-Apr-20')
 
     confirmedincrease = []
     recoveredincrease = []
@@ -475,14 +469,11 @@ def get_state_data(state_name,state_code):
     
     for change in changes:
         if(change['status']=='Confirmed'):
-            confirmedincrease.append(int(change[state_code]))
+            confirmedincrease.append(get_count(change[state_code]))
         if(change['status']=='Recovered'):
-            recoveredincrease.append(int(change[state_code])) 
+            recoveredincrease.append(get_count(change[state_code])) 
         if(change['status']=='Deceased'):
-            deathincrease.append(int(change[state_code]))
-    confirmedincrease.append(info['confirmed']-sum(confirmedincrease))
-    recoveredincrease.append(info['recovered']-sum(recoveredincrease))
-    deathincrease.append(info['death']-sum(deathincrease))
+            deathincrease.append(get_count(change[state_code]))
 
     for i in range(1,len(confirmedincrease)+1):
         confirmed.append(sum(confirmedincrease[0:i]))
@@ -509,20 +500,21 @@ def get_state_data(state_name,state_code):
         'activeincrease' : activeincrease
     }
 
+    info = get_info_details(info,days)
 
     statewise_json = requests.get(statewise_json_url).json()
 
-    karnataka=statewise_json[state_name]
+    state=statewise_json[state_name]
 
-    state = []
+    districts = []
     confirmed = []
 
-    for district in karnataka['districtData']:
-        state.append(district)
-        confirmed.append(karnataka['districtData'][district]['confirmed'])
+    for district in state['districtData']:
+        districts.append(district)
+        confirmed.append(state['districtData'][district]['confirmed'])
 
 
-    data=pd.DataFrame(zip(state,confirmed),columns=['state','confirmed'])
+    data=pd.DataFrame(zip(districts,confirmed),columns=['state','confirmed'])
     data.sort_values(by=['confirmed'],axis=0,inplace=True,ascending=False)
 
 
@@ -555,11 +547,53 @@ def get_statename(text):
     statewise_dataframe = pd.DataFrame(country_json['statewise'])
     
     states = statewise_dataframe['state'].tolist()
+    raw_states = statewise_dataframe['state'].apply(str.lower).tolist()
     statecode = statewise_dataframe['statecode'].apply(str.lower).tolist()
 
-    details = dict(zip(states,statecode))
-    text = str(text)
+
+
+    for i in range(len(raw_states)):
+        raw_states[i] = raw_states[i].replace(" ",'')
+
+
+    details = list(zip(states,statecode))
+    raw = dict(zip(raw_states,details))
+    
+    text = str(text).lower()
     state = (re.findall(r'\w+', text)[0])
-    lst = [state,details[state]]
+    lst = raw[state]
     print(lst)
     return lst
+
+
+def get_info_details(info,days):
+
+    try:
+        previous_active = days['active'][-1]
+    except:
+        previous_active = days['confirmed'][-1]-days['recovered'][-1]-days['death'][-1]
+
+    info['diffconfirmed'] = info['confirmed']-days['confirmed'][-1]
+    info['diffactive'] = info['active']-previous_active
+    info['diffrecovered'] = info['recovered']-days['recovered'][-1]
+    info['diffdeath'] = info['death']-days['death'][-1]
+    if(info['diffdeath']<0):
+        info['diffdeath']=0
+    try:
+        info['percentageconfirmed']=round(info['diffconfirmed']*100/days['confirmed'][-1])
+    except:
+        info['percentageconfirmed']=0
+    try:
+        info['percentageactive']=round(info['diffactive']*100/previous_active)
+    except:
+        info['percentageactive']=0
+    try:
+        info['percentagerecovered']=round(info['diffrecovered']*100/days['recovered'][-1])
+    except:
+        info['percentagerecovered']=0
+    try:
+        info['percentagedeath']=round(info['diffdeath']*100/days['death'][-1])
+    except:
+        info['percentagedeath']=0
+
+    return info
