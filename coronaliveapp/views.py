@@ -362,9 +362,6 @@ def tweet(req):
 
 
 
-
-
-
 def get_state_data(state_name,state_code):
     url = 'https://api.covid19india.org/data.json'
     state_daily_url = "https://api.covid19india.org/states_daily.json"
@@ -378,12 +375,7 @@ def get_state_data(state_name,state_code):
 
     present_data = statewise_dataframe[statewise_dataframe['state']== state_name]
 
-    info = {
-        'active' : int(present_data['active'].sum()),
-        'confirmed' : int(present_data['confirmed'].sum()),
-        'death' : int(present_data['deaths'].sum()),
-        'recovered' : int(present_data['recovered'].sum())
-    }           
+    info = get_info_details(present_data)          
 
 
 
@@ -437,7 +429,7 @@ def get_state_data(state_name,state_code):
         'activeincrease' : activeincrease
     }
 
-    info = get_info_details(info,days)
+
 
     statewise_json = requests.get(statewise_json_url).json()
 
@@ -450,10 +442,8 @@ def get_state_data(state_name,state_code):
         districts.append(district)
         confirmed.append(state['districtData'][district]['confirmed'])
 
-
     data=pd.DataFrame(zip(districts,confirmed),columns=['state','confirmed'])
     data.sort_values(by=['confirmed'],axis=0,inplace=True,ascending=False)
-
 
     statewise = {
         'state' : data['state'].tolist(),
@@ -475,11 +465,9 @@ def get_state_data(state_name,state_code):
 
 
 def get_statename(text):
-    
 
     url = 'https://api.covid19india.org/data.json'
     country_json = requests.get(url).json()
-
 
     statewise_dataframe = pd.DataFrame(country_json['statewise'])
     
@@ -487,11 +475,8 @@ def get_statename(text):
     raw_states = statewise_dataframe['state'].apply(str.lower).tolist()
     statecode = statewise_dataframe['statecode'].apply(str.lower).tolist()
 
-
-
     for i in range(len(raw_states)):
         raw_states[i] = raw_states[i].replace(" ",'')
-
 
     details = list(zip(states,statecode))
     raw = dict(zip(raw_states,details))
@@ -503,36 +488,45 @@ def get_statename(text):
     return lst
 
 
-def get_info_details(info,days):
-
-    try:
-        previous_active = days['active'][-1]
-    except:
-        previous_active = days['confirmed'][-1]-days['recovered'][-1]-days['death'][-1]
-
-    info['diffconfirmed'] = info['confirmed']-days['confirmed'][-1]
-    info['diffactive'] = info['active']-previous_active
-    info['diffrecovered'] = info['recovered']-days['recovered'][-1]
-    info['diffdeath'] = info['death']-days['death'][-1]
-    if(info['diffdeath']<0):
-        info['diffdeath']=0
-    try:
-        info['percentageconfirmed']=round(info['diffconfirmed']*100/days['confirmed'][-1])
-    except:
+def get_info_details(present_data):
+    info = {
+        'active' : int(present_data['active'].sum()),
+        'confirmed' : int(present_data['confirmed'].sum()),
+        'death' : int(present_data['deaths'].sum()),
+        'recovered' : int(present_data['recovered'].sum()),
+        'diffconfirmed' : int(present_data['deltaconfirmed'].sum()),
+        'diffdeath' : int(present_data['deltadeaths'].sum()),
+        'diffrecovered' : int(present_data['deltarecovered'].sum()),
+        'diffactive' : int(present_data['deltaconfirmed'].sum())-int(present_data['deltadeaths'].sum())-int(present_data['deltarecovered'].sum())
+    }
+    if(info['diffconfirmed']==0):
         info['percentageconfirmed']=0
-    try:
-        info['percentageactive']=round(info['diffactive']*100/previous_active)
-    except:
-        info['percentageactive']=0
-    try:
-        info['percentagerecovered']=round(info['diffrecovered']*100/days['recovered'][-1])
-    except:
+    elif((info['confirmed']-info['diffconfirmed'])==0):
+        info['percentageconfirmed']=""
+    else:
+        info['percentageconfirmed']=int((info['diffconfirmed']*100)/(info['confirmed']-info['diffconfirmed']))
+    
+    if(info['diffrecovered']==0):
         info['percentagerecovered']=0
-    try:
-        info['percentagedeath']=round(info['diffdeath']*100/days['death'][-1])
-    except:
+    elif((info['recovered']-info['diffrecovered'])==0):
+        info['percentagerecovered']=""
+    else:
+        info['percentagerecovered']=int((info['diffrecovered']*100)/(info['recovered']-info['diffrecovered']))
+    
+    if(info['diffdeath']==0):
         info['percentagedeath']=0
-
+    elif((info['death']-info['diffdeath'])==0):
+        info['percentagedeath']=""
+    else:    
+        info['percentagedeath']=int((info['diffdeath']*100)/(info['death']-info['diffdeath']))
+    
+    if(info['diffactive']==0):
+        info['percentageactive']=0
+    elif((info['active']-info['diffactive'])==0):
+        info['percentageactive']=""
+    else:
+        info['percentageactive']=int((info['diffactive']*100)/(info['active']-info['diffactive']))
+    
     return info
 
 def get_scraped_data():
@@ -634,12 +628,8 @@ def get_data_from_covid19org():
 
     statewise_dataframe['urlkey'] = statewise_dataframe['state'].apply(get_urlkey)
 
-    info = {
-        'active' : int(present_data['active'].sum()),
-        'confirmed' : int(present_data['confirmed'].sum()),
-        'death' : int(present_data['deaths'].sum()),
-        'recovered' : int(present_data['recovered'].sum())
-    }
+    info = get_info_details(present_data)
+    
 
     statewise_dataframe = statewise_dataframe[1:]
     statewise_dataframe['confirmed'] = statewise_dataframe['confirmed'].apply(int)
@@ -670,8 +660,6 @@ def get_data_from_covid19org():
         'recoveredincrease' : daily_dataframe['dailyrecovered'].apply(int).tolist(),
         'deathincrease' : daily_dataframe['dailydeceased'].apply(int).tolist()
     }
-    
-    info = get_info_details(info,days)
     
     tests = None
 
