@@ -1,16 +1,26 @@
 .hidden{
     display: none;
 }
+.center{
+    text-align: center;
+}
 body{
     margin: 0;
     padding: 0;
     font-family: arial,sans-serif;
     user-select: none;
 }
+.main {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+.grey-back{
+    background: #ecf0f5;
+}
 .overview {
     display: flex;
     justify-content: space-between;
-    margin-top: 15px;
+    padding: 10px;
 }
 .statbox{
     display: flex;
@@ -69,10 +79,6 @@ body{
 #confirmed-box {
     background-image: linear-gradient(to right,#ca538b,#7f2750);
 }
-.main {
-    max-width: 1300px;
-    margin: 0 auto;   
-}
 figure{
     margin: 0;
 }
@@ -87,13 +93,34 @@ figure{
 .piediv { 
     width: 300px;
 }
-#container {
-    height: 100vh;
+.section-2{
+    display: flex;
+    padding:20px 0;
 }
+/* #container {
+    height: 100vh;
+} */
 text.highcharts-credits {
     display: none;
 }
+.state-table a{
+    text-decoration: none;
+    color: #000;
+}
+table {
+    border-collapse: collapse;
+}
 
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
 .sources {
     padding: 10px;
     display: flex;
@@ -125,6 +152,39 @@ footer{
     padding-top: 10px;
     color: #fff;
 }
+
+/* table sort starts */
+th[role=columnheader]:not(.no-sort) {
+	cursor: pointer;
+}
+th[role=columnheader]:not(.no-sort):after {
+	content: '';
+	float: right;
+	margin-top: 7px;
+	border-width: 0 4px 4px;
+	border-style: solid;
+	border-color: #404040 transparent;
+	visibility: hidden;
+	opacity: 0;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+}
+th[aria-sort=ascending]:not(.no-sort):after {
+	border-bottom: none;
+	border-width: 4px 4px 0;
+}
+th[aria-sort]:not(.no-sort):after {
+	visibility: visible;
+	opacity: 0.4;
+}
+th[role=columnheader]:not(.no-sort):hover:after {
+	visibility: visible;
+	opacity: 1;
+}
+/* table sort ends */
+
 @media only screen and (max-width: 600px) {
     .section-1 {
         flex-direction: column;
@@ -136,6 +196,7 @@ footer{
         margin: 0;
         justify-content: space-evenly;
         flex-wrap: wrap;
+        padding: 0 0 10px 0;
     }
     .statbox {
         margin: 10px 0 0 0;

@@ -72,11 +72,6 @@ function plotDailyGraph()
 
 function plotCumulativeGraph()
 {
-    d.getElementById('daily-btn').style.backgroundColor= "#3fb1cb";
-    d.getElementById('cumulative-btn').style.backgroundColor= "grey";
-    d.getElementById('cumulative-btn').disabled= true;
-    d.getElementById('daily-btn').disabled= false;
-
     Highcharts.chart('linecontainer', {
         chart: {
             type: 'area'
@@ -105,7 +100,7 @@ function plotCumulativeGraph()
         xAxis: {
             categories: data.days.date,
             plotBands: [{
-                from: 23,
+                from: 53,
                 to:data.days.date.length,
                 color: 'rgba(68, 170, 213, .2)',
                 label: { 
@@ -163,10 +158,15 @@ function plotCumulativeGraph()
             color: '#34495e'
         }]
     });
+
+    // d.getElementById('daily-btn').style.backgroundColor= "#3fb1cb";
+    // d.getElementById('cumulative-btn').style.backgroundColor= "grey";
+    // d.getElementById('cumulative-btn').disabled= true;
+    // d.getElementById('daily-btn').disabled= false;
 }
 
 function showBtns() {
-    d.getElementsByClassName('btn-section')[0].style.display = 'block';
+    // d.getElementsByClassName('btn-section')[0].style.display = 'block';
 }
 
 plotCumulativeGraph();
@@ -229,7 +229,8 @@ Highcharts.chart('piecontainer', {
 
 Highcharts.chart('container', {
     chart: {
-        type: 'bar'
+        type: 'bar',
+        height: ((data.statewise.state.length * 36)+'px')
     },
     title: {
         text: 'Statewise Corona Cases',
@@ -271,3 +272,5 @@ Highcharts.chart('container', {
         color: '#34495e'
     }]
 });
+
+new Tablesort(document.getElementById('statewise-table'));

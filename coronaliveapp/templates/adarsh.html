@@ -184,6 +184,7 @@
     var data = {{data}};
 </script>
 <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="{% static 'js/table-sort.min.js' %}?v=1.0.0"></script>
 <script>
 /*
     var a=[];
@@ -218,7 +219,7 @@
         death.innerHTML=data.statewise.death[i]; 
 
     }
-
+new Tablesort(document.getElementById('statewise-table'));
 function plotdailygraph()
 {
 
