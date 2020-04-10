@@ -19,9 +19,8 @@ from coronaliveapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path(r'^[\w]+-abc-bde/', views.ping, name='ping'),
     path('', views.home, name='home'),
-    path('adarsh/', views.adarsh),
-    re_path(r'^[\w]+-state-corona-update/',views.stateupdate, name='stateupdate')
-
+    path('json/', views.home, name='home'),
+    re_path(r'^[\w]+-coronavirus-updates/',views.stateupdate, name='stateupdate'),
+    path('ping/', views.ping, name='ping')
 ]

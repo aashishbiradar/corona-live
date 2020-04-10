@@ -22,106 +22,38 @@ def home(req):
     cached_data = get_cache(cache_key, expiry)
     from_cache= 'true'
 
-    if not cached_data:
+    if True or not cached_data:
         try:
-            soup=get_mohfw()
-            statewise=get_statewise(soup)
-            wiki=get_wiki()
-            tests=get_tests(wiki)
-
-            #latest data
-            latest = get_info(soup)
-            updated = False
-
-            try:
-                latest_rec = Daily.objects.get(date = date.today())
-                if int(latest['confirmed']) > latest_rec.confirmed:
-                    updated = True
-                latest_rec.confirmed = int(latest['confirmed'])
-                latest_rec.active = int(latest['infected'])
-                latest_rec.recovered = int(latest['cured'])
-                latest_rec.death = int(latest['death'])
-                latest_rec.source = latest['source']
-            except Daily.DoesNotExist:
-                latest_rec = Daily(
-                    date = date.today(),
-                    confirmed = int(latest['confirmed']),
-                    active = int(latest['infected']),
-                    recovered = int(latest['cured']),
-                    death = int(latest['death']),
-                    source = latest['source']
-                )
-            latest_rec.save()
-
-            try:
-                if updated:
-                    tweet_update(latest)
-            except:
-                pass
-
-            #daily data
-            daily_df = pd.DataFrame(Daily.objects.all().values())
-            daily_df['date'] = pd.to_datetime(daily_df['date'])
-            daily_df.sort_values(by=['date'], inplace=True)
-            daily_df['date'] = daily_df['date'].dt.strftime('%b %d')
-            
-            days = {
-                'date': daily_df['date'].tolist(),
-                'confirmed': daily_df['confirmed'].tolist(),
-                'recovered': daily_df['recovered'].tolist(),
-                'death': daily_df['death'].tolist()
-            }
-            days['confirmedincrease']=[days['confirmed'][0]]
-            days['recoveredincrease']=[days['recovered'][0]]
-            days['deathincrease']=[days['death'][0]]
-            for i in range(1,len(days['confirmed'])):
-                days['confirmedincrease'].append(days['confirmed'][i]-days['confirmed'][i-1])
-                days['recoveredincrease'].append(days['recovered'][i]-days['recovered'][i-1])
-                days['deathincrease'].append(days['death'][i]-days['death'][i-1])
-
-            """
-            days['predict']=list()
-            for i in range(0,4):
-                days['predict'].append(days['confirmed'][i])
-            for i in range(4,len(days['confirmed'])):
-                days['predict'].append(int(days['predict'][i-1]*0.17+days['predict'][i-1]))
-            """
-            info = {
-                'confirmed': days['confirmed'][-1],
-                'active': daily_df['active'].tolist()[-1],
-                'recovered': days['recovered'][-1],
-                'death': days['death'][-1],
-                'diffconfirmed': days['confirmed'][-1]-days['confirmed'][-2],
-                'diffactive': daily_df['active'].tolist()[-1]-daily_df['active'].tolist()[-2],
-                'diffrecovered': days['recovered'][-1]-days['recovered'][-2],
-                'diffdeath': days['death'][-1]-days['death'][-2]
-            }
-
-            info['percentageconfirmed']=round(info['diffconfirmed']*100/days['confirmed'][-2])
-            info['percentageactive']=round(info['diffactive']*100/daily_df['active'].tolist()[-2])
-            info['percentagerecovered']=round(info['diffrecovered']*100/days['recovered'][-2])
-            info['percentagedeath']=round(info['diffdeath']*100/days['death'][-2])
-
-            cached_data = {
-                'statewise': statewise,
-                'info': info,
-                'days': days,
-                'tests': tests,
-            }
-
+            cached_data = get_data_from_covid19org()
             save_cache(cache_key, cached_data)
             from_cache= 'false'
         except:
             cached_data = get_cache(cache_key)
-
         
     t2 = time.time()
     compute = t2-t1
+    
+    if req.META['RAW_URI'] == '/json/':
+        return JsonResponse(cached_data)
+
+    states = []
+
+    for i in  range(len(cached_data['statewise']['state'])):
+        states.append({
+            'name': cached_data['statewise']['state'][i],
+            'confirmed': cached_data['statewise']['confirmed'][i],
+            'active': cached_data['statewise']['active'][i],
+            'discharged': cached_data['statewise']['discharged'][i],
+            'death': cached_data['statewise']['death'][i],
+            'urlkey': cached_data['statewise']['urlkey'][i],
+        })
+    
     return render(req,'home.html',{
         'data': mark_safe(json.dumps(cached_data)),
         'compute': compute,
         'from_cache': from_cache,
-        'dict': cached_data
+        'dict': cached_data,
+        'states': states
     })
 
 
@@ -597,3 +529,149 @@ def get_info_details(info,days):
         info['percentagedeath']=0
 
     return info
+
+def get_scraped_data():
+    soup=get_mohfw()
+    statewise=get_statewise(soup)
+    wiki=get_wiki()
+    tests=get_tests(wiki)
+
+    #latest data
+    latest = get_info(soup)
+    updated = False
+
+    try:
+        latest_rec = Daily.objects.get(date = date.today())
+        if int(latest['confirmed']) > latest_rec.confirmed:
+            updated = True
+        latest_rec.confirmed = int(latest['confirmed'])
+        latest_rec.active = int(latest['infected'])
+        latest_rec.recovered = int(latest['cured'])
+        latest_rec.death = int(latest['death'])
+        latest_rec.source = latest['source']
+    except Daily.DoesNotExist:
+        latest_rec = Daily(
+            date = date.today(),
+            confirmed = int(latest['confirmed']),
+            active = int(latest['infected']),
+            recovered = int(latest['cured']),
+            death = int(latest['death']),
+            source = latest['source']
+        )
+    latest_rec.save()
+
+    try:
+        if updated:
+            tweet_update(latest)
+    except:
+        pass
+
+    #daily data
+    daily_df = pd.DataFrame(Daily.objects.all().values())
+    daily_df['date'] = pd.to_datetime(daily_df['date'])
+    daily_df.sort_values(by=['date'], inplace=True)
+    daily_df['date'] = daily_df['date'].dt.strftime('%b %d')
+    
+    days = {
+        'date': daily_df['date'].tolist(),
+        'confirmed': daily_df['confirmed'].tolist(),
+        'recovered': daily_df['recovered'].tolist(),
+        'death': daily_df['death'].tolist()
+    }
+    days['confirmedincrease']=[days['confirmed'][0]]
+    days['recoveredincrease']=[days['recovered'][0]]
+    days['deathincrease']=[days['death'][0]]
+    for i in range(1,len(days['confirmed'])):
+        days['confirmedincrease'].append(days['confirmed'][i]-days['confirmed'][i-1])
+        days['recoveredincrease'].append(days['recovered'][i]-days['recovered'][i-1])
+        days['deathincrease'].append(days['death'][i]-days['death'][i-1])
+
+    """
+    days['predict']=list()
+    for i in range(0,4):
+        days['predict'].append(days['confirmed'][i])
+    for i in range(4,len(days['confirmed'])):
+        days['predict'].append(int(days['predict'][i-1]*0.17+days['predict'][i-1]))
+    """
+    info = {
+        'confirmed': days['confirmed'][-1],
+        'active': daily_df['active'].tolist()[-1],
+        'recovered': days['recovered'][-1],
+        'death': days['death'][-1],
+        'diffconfirmed': days['confirmed'][-1]-days['confirmed'][-2],
+        'diffactive': daily_df['active'].tolist()[-1]-daily_df['active'].tolist()[-2],
+        'diffrecovered': days['recovered'][-1]-days['recovered'][-2],
+        'diffdeath': days['death'][-1]-days['death'][-2]
+    }
+
+    info['percentageconfirmed']=round(info['diffconfirmed']*100/days['confirmed'][-2])
+    info['percentageactive']=round(info['diffactive']*100/daily_df['active'].tolist()[-2])
+    info['percentagerecovered']=round(info['diffrecovered']*100/days['recovered'][-2])
+    info['percentagedeath']=round(info['diffdeath']*100/days['death'][-2])
+
+    return {
+        'statewise': statewise,
+        'info': info,
+        'days': days,
+        'tests': tests,
+    }
+
+def get_urlkey(string):
+    return string.replace(' ','').lower()
+
+def get_data_from_covid19org():
+    url = 'https://api.covid19india.org/data.json'
+    country_json = requests.get(url).json()
+
+    statewise_dataframe = pd.DataFrame(country_json['statewise'])
+
+    present_data = statewise_dataframe[statewise_dataframe['state']=='Total']
+
+    statewise_dataframe['urlkey'] = statewise_dataframe['state'].apply(get_urlkey)
+
+    info = {
+        'active' : int(present_data['active'].sum()),
+        'confirmed' : int(present_data['confirmed'].sum()),
+        'death' : int(present_data['deaths'].sum()),
+        'recovered' : int(present_data['recovered'].sum())
+    }
+
+    statewise_dataframe = statewise_dataframe[1:]
+    statewise_dataframe['confirmed'] = statewise_dataframe['confirmed'].apply(int)
+    statewise_dataframe = statewise_dataframe[statewise_dataframe['confirmed'] != 0]
+    statewise_dataframe.sort_values(by=['confirmed'], inplace=True, ascending = False)
+    #statewise_dataframe.sort_values(by=['confirmed'], inplace=True, asending = False)
+
+    statewise = {
+        'state' : statewise_dataframe['state'].tolist(),
+        'statecode' : statewise_dataframe['statecode'].apply(str.lower).tolist(),
+        'active' : statewise_dataframe['active'].apply(int).tolist(),
+        'confirmed':statewise_dataframe['confirmed'].apply(int).tolist(),
+        'death' : statewise_dataframe['deaths'].apply(int).tolist(),
+        'discharged' : statewise_dataframe['recovered'].apply(int).tolist(),
+        'urlkey': statewise_dataframe['urlkey'].tolist()
+    }
+
+    daily_dataframe = pd.DataFrame(country_json['cases_time_series'])
+
+    days = {
+        'date' : daily_dataframe['date'].tolist(),
+        'confirmed' : daily_dataframe['totalconfirmed'].apply(int).tolist(),
+        'recovered' : daily_dataframe['totalrecovered'].apply(int).tolist(),
+        'death' : daily_dataframe['totaldeceased'].apply(int).tolist(),
+        'confirmedincrease' : daily_dataframe['dailyconfirmed'].apply(int).tolist(),
+        'recoveredincrease' : daily_dataframe['dailyrecovered'].apply(int).tolist(),
+        'deathincrease' : daily_dataframe['dailydeceased'].apply(int).tolist()
+    }
+    
+    info = get_info_details(info,days)
+    
+    tests = None
+
+    return {
+        'statewise': statewise,
+        'info': info,
+        'days': days,
+        'tests': tests
+    }
+
