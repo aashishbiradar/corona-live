@@ -4,6 +4,7 @@
 body{
     margin: 0;
     padding: 0;
+    font-family: arial,sans-serif;
     user-select: none;
 }
 .overview {
@@ -94,35 +95,34 @@ text.highcharts-credits {
 }
 
 .sources {
-    width: 200px;
-    margin: 100px auto 40px auto;
-}
-.source-title {
-    font-family: sans-serif;
-    font-size: 18px;
-    text-align: center;
-    margin: 5px;
-}
-.our-sources {
+    padding: 10px;
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
 }
-
+.source-title {
+    font-size: 16px;
+    margin: 5px;
+}
 .source-link {
-    border: #3498DB 1.5px solid;
+    color: #fff;
+    border: #fff 1.5px solid;
     border-radius: 22px;
     text-decoration: none;
-    padding: 3px 5px;
+    padding: 5px 10px 3px 10px;
     font-size: 12px;
     margin: 3px;
-    color: #3498DB;;
+    line-height: 1;
 }
-
-
+.quote{
+    font-size: 22px;
+    font-weight: bold;
+}
 footer{
     background-color: #3498db;
     text-align: center;
-    padding: 10px;
+    padding-top: 10px;
     color: #fff;
 }
 @media only screen and (max-width: 600px) {
