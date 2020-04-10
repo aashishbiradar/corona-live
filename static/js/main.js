@@ -99,16 +99,16 @@ function plotCumulativeGraph()
         },
         xAxis: {
             categories: data.days.date,
-            plotBands: [{
-                from: 53,
-                to:data.days.date.length,
-                color: 'rgba(68, 170, 213, .2)',
-                label: { 
-                text: '21 days lockdown', // Content of the label. 
-                align: 'center', // Positioning of the label. 
-                //Default to center. x: +10 // Amount of pixels the label will be repositioned according to the alignment. 
-                }
-            }]
+            // plotBands: [{
+            //     from: 53,
+            //     to:data.days.date.length,
+            //     color: 'rgba(68, 170, 213, .2)',
+            //     label: { 
+            //     text: '21 days lockdown', // Content of the label. 
+            //     align: 'center', // Positioning of the label. 
+            //     //Default to center. x: +10 // Amount of pixels the label will be repositioned according to the alignment. 
+            //     }
+            // }]
         },
         yAxis: {
             title: {

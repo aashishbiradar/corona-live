@@ -17,6 +17,9 @@ from django.urls import reverse
 #route functions
 def home(req):
     t1 = time.time()
+
+    json_req = req.META['RAW_URI'] == '/json/'
+
     cache_key = 'homepage'
     expiry = 5 
     cached_data = get_cache(cache_key, expiry)
@@ -27,13 +30,15 @@ def home(req):
             cached_data = get_data_from_covid19org()
             save_cache(cache_key, cached_data)
             from_cache= 'false'
-        except:
+        except Exception as e:
+            if json_req:
+                raise e
             cached_data = get_cache(cache_key)
         
     t2 = time.time()
     compute = t2-t1
     
-    if req.META['RAW_URI'] == '/json/':
+    if json_req:
         return JsonResponse(cached_data)
 
     states = []
@@ -653,7 +658,9 @@ def get_data_from_covid19org():
     }
 
     daily_dataframe = pd.DataFrame(country_json['cases_time_series'])
-
+    daily_dataframe = daily_dataframe.tail(30)
+    daily_dataframe['fulldate'] = daily_dataframe['date'].apply(lambda d: datetime.strptime(d+'2020','%d %B %Y'))
+    daily_dataframe['date'] = daily_dataframe['fulldate'].apply(lambda d: datetime.strftime(d,'%b %d'))
     days = {
         'date' : daily_dataframe['date'].tolist(),
         'confirmed' : daily_dataframe['totalconfirmed'].apply(int).tolist(),

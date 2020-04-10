@@ -97,11 +97,12 @@ figure{
     display: flex;
     padding:20px 0;
 }
-/* #container {
-    height: 100vh;
-} */
 text.highcharts-credits {
     display: none;
+}
+.state-table {
+    max-width: 100vw;
+    overflow: auto;
 }
 .state-table a{
     text-decoration: none;
@@ -110,14 +111,11 @@ text.highcharts-credits {
 table {
     border-collapse: collapse;
 }
-
-
 td, th {
     border: 1px solid #dddddd;
     text-align: left;
     padding: 8px;
 }
-
 tr:nth-child(even) {
     background-color: #dddddd;
 }
@@ -186,7 +184,8 @@ th[role=columnheader]:not(.no-sort):hover:after {
 /* table sort ends */
 
 @media only screen and (max-width: 600px) {
-    .section-1 {
+    .section-1,
+    .section-2 {
         flex-direction: column;
     }
     .linediv { 
@@ -216,5 +215,13 @@ th[role=columnheader]:not(.no-sort):hover:after {
     .btn-section{
         text-align: center;
         margin: 0 0 20px 0;
+    }
+    .state-table{
+        font-size: 12px;
+        padding: 10px;
+    }
+    .state-table td,
+    .state-table th {
+        padding: 6px 4px;
     }
 }
