@@ -513,10 +513,8 @@ def get_state_data(state_name,state_code):
         districts.append(district)
         confirmed.append(state['districtData'][district]['confirmed'])
 
-
     data=pd.DataFrame(zip(districts,confirmed),columns=['state','confirmed'])
     data.sort_values(by=['confirmed'],axis=0,inplace=True,ascending=False)
-
 
     statewise = {
         'state' : data['state'].tolist(),
@@ -538,11 +536,9 @@ def get_state_data(state_name,state_code):
 
 
 def get_statename(text):
-    
 
     url = 'https://api.covid19india.org/data.json'
     country_json = requests.get(url).json()
-
 
     statewise_dataframe = pd.DataFrame(country_json['statewise'])
     
@@ -550,11 +546,8 @@ def get_statename(text):
     raw_states = statewise_dataframe['state'].apply(str.lower).tolist()
     statecode = statewise_dataframe['statecode'].apply(str.lower).tolist()
 
-
-
     for i in range(len(raw_states)):
         raw_states[i] = raw_states[i].replace(" ",'')
-
 
     details = list(zip(states,statecode))
     raw = dict(zip(raw_states,details))
