@@ -5,7 +5,7 @@ import pandas as pd
 from datetime import datetime, date
 from bs4 import BeautifulSoup, Comment
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.utils.safestring import mark_safe
 from django.shortcuts import render
 from django.utils import timezone
@@ -25,7 +25,7 @@ def home(req):
     cached_data = get_cache(cache_key, expiry)
     from_cache= 'true'
 
-    if not cached_data:
+    if True or not cached_data:
         try:
             cached_data = get_data_from_covid19org()
             save_cache(cache_key, cached_data)
@@ -146,9 +146,13 @@ def adarsh(req):
 def stateupdate(req):
     t1 = time.time()
 
-    state_details = get_statename(req.META['RAW_URI'])
+    raw_uri = req.META['RAW_URI']
+    state_name = raw_uri.replace('/','').replace('-coronavirus-updates','').replace('-', ' ')
 
-    data = get_state_data(state_details[0],state_details[1])    
+    data = get_state_data(state_name)
+
+    if data == 'STATE_NOT_FOUND':
+        raise Http404()
     from_cache= 'false'
     
     t2 = time.time()
@@ -362,22 +366,28 @@ def tweet(req):
 
 
 
-def get_state_data(state_name,state_code):
+def get_state_data(state_name):
     url = 'https://api.covid19india.org/data.json'
-    state_daily_url = "https://api.covid19india.org/states_daily.json"
-    statewise_json_url = 'https://api.covid19india.org/state_district_wise.json'
-
-
 
     country_json = requests.get(url).json()
 
     statewise_dataframe = pd.DataFrame(country_json['statewise'])
+    
+    statewise_dataframe['state_key'] = statewise_dataframe['state'].apply(str.lower)
 
-    present_data = statewise_dataframe[statewise_dataframe['state']== state_name]
+    present_data = statewise_dataframe[statewise_dataframe['state_key']== state_name]
 
-    info = get_info_details(present_data)          
+    state_name = present_data['state'].sum()
+    
+    if not state_name:
+        return 'STATE_NOT_FOUND'
+    
+    state_code = present_data['statecode'].sum().lower()
 
+    info = get_info_details(present_data)
 
+    state_daily_url = "https://api.covid19india.org/states_daily.json"
+    statewise_json_url = 'https://api.covid19india.org/state_district_wise.json'
 
     statewise_timeline = requests.get(state_daily_url).json()
     changes = statewise_timeline['states_daily']
@@ -429,11 +439,9 @@ def get_state_data(state_name,state_code):
         'activeincrease' : activeincrease
     }
 
-
-
     statewise_json = requests.get(statewise_json_url).json()
 
-    state=statewise_json[state_name]
+    state = statewise_json[state_name]
 
     districts = []
     confirmed = []
@@ -450,7 +458,7 @@ def get_state_data(state_name,state_code):
         'active' : data['confirmed'].tolist()
     }
 
-    tests={1:1,2:2}
+    tests = None
 
     data = {
         'statewise': statewise,
@@ -465,26 +473,28 @@ def get_state_data(state_name,state_code):
 
 
 def get_statename(text):
+    try:
+        url = 'https://api.covid19india.org/data.json'
+        country_json = requests.get(url).json()
 
-    url = 'https://api.covid19india.org/data.json'
-    country_json = requests.get(url).json()
+        statewise_dataframe = pd.DataFrame(country_json['statewise'])
+        
+        states = statewise_dataframe['state'].tolist()
+        raw_states = statewise_dataframe['state'].apply(str.lower).tolist()
+        statecode = statewise_dataframe['statecode'].apply(str.lower).tolist()
 
-    statewise_dataframe = pd.DataFrame(country_json['statewise'])
-    
-    states = statewise_dataframe['state'].tolist()
-    raw_states = statewise_dataframe['state'].apply(str.lower).tolist()
-    statecode = statewise_dataframe['statecode'].apply(str.lower).tolist()
+        for i in range(len(raw_states)):
+            raw_states[i] = raw_states[i].replace(" ",'')
 
-    for i in range(len(raw_states)):
-        raw_states[i] = raw_states[i].replace(" ",'')
-
-    details = list(zip(states,statecode))
-    raw = dict(zip(raw_states,details))
-    
-    text = str(text).lower()
-    state = (re.findall(r'\w+', text)[0])
-    lst = raw[state]
-    print(lst)
+        details = list(zip(states,statecode))
+        raw = dict(zip(raw_states,details))
+        
+        text = str(text).lower()
+        state = (re.findall(r'\w+', text)[0])
+        lst = raw[state]
+        print(lst)
+    except:
+        raise Http404()
     return lst
 
 
@@ -616,7 +626,7 @@ def get_scraped_data():
     }
 
 def get_urlkey(string):
-    return string.replace(' ','').lower()
+    return string.strip().replace(' ','-').lower()
 
 def get_data_from_covid19org():
     url = 'https://api.covid19india.org/data.json'
@@ -661,7 +671,10 @@ def get_data_from_covid19org():
         'deathincrease' : daily_dataframe['dailydeceased'].apply(int).tolist()
     }
     
-    tests = None
+    tests = {
+        'samples' : '161,330',
+        'perMillion': 119
+    }
 
     return {
         'statewise': statewise,

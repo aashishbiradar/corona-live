@@ -1,0 +1,29 @@
+{% load static %}
+    <footer>
+        <div class="quote">
+            Let's fight Coronavirus together!
+        </div>
+        <div class="sources">
+            <span class="source-title">Our Sources:</span>
+            <a class="source-link" href="https://www.mohfw.gov.in/">MoHFW</a>
+            <a class="source-link" href="https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_India">Wikipedia</a>
+            <a class="source-link" href="https://www.worldometers.info/coronavirus/country/india/">Worldometers</a>
+            <a class="source-link" href="https://www.covid19india.org/">covid19india</a>
+        </div>
+    </footer>
+</body>
+<script>
+    var data = {{data}};
+</script>
+<script defer src="https://code.highcharts.com/highcharts.js"></script>
+<script defer src="{% static 'js/table-sort.min.js' %}?v=1.0.0"></script>
+<script defer src="{% static 'js/main.js' %}?v=1.1.7"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-66396003-2" crossorigin="anonymous"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-66396003-2');
+</script>
+</html>
+<!--compute={{compute}} from_cache={{from_cache}}-->

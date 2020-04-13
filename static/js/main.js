@@ -112,7 +112,8 @@ function plotCumulativeGraph()
         },
         yAxis: {
             title: {
-                text: 'Cases'
+                text: 'Cases',
+                enabled: false
             }
         },
         tooltip: {
@@ -227,18 +228,19 @@ Highcharts.chart('piecontainer', {
     }]
 });
 
+var stateChartHeight = (Math.max((data.statewise.state.length * 36),200) + 'px');
 Highcharts.chart('container', {
     chart: {
         type: 'bar',
-        height: ((data.statewise.state.length * 36)+'px')
+        height: stateChartHeight
     },
     title: {
-        text: 'Statewise Corona Cases',
-        style: {
-            color: '#333333',
-            fontWeight: 'bold',
-            fontSize:'18px'
-        }
+        text: '',
+        // style: {
+        //     color: '#333333',
+        //     fontWeight: 'bold',
+        //     fontSize:'18px'
+        // }
     },
     xAxis: {
         categories: data.statewise.state
@@ -274,3 +276,10 @@ Highcharts.chart('container', {
 });
 
 new Tablesort(document.getElementById('statewise-table'));
+
+d.querySelectorAll('.state-table tr').forEach(function(tr) {
+    tr.addEventListener('click', function() {
+        link = this.getElementsByTagName('a')[0];
+        link && link.click();
+    });
+});

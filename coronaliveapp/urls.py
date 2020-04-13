@@ -21,6 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('json/', views.home, name='home'),
-    re_path(r'^[\w]+-coronavirus-updates/',views.stateupdate, name='stateupdate'),
+    re_path(r'^[a-z-]+-coronavirus-updates/$',views.stateupdate, name='stateupdate'),
     path('ping/', views.ping, name='ping')
 ]
