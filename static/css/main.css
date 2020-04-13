@@ -31,7 +31,6 @@ body{
     border-radius: 6px;
     color: #fff;
     font-size: 15px;
-    font-family: Arial, Helvetica, sans-serif;
 }
 .btn-section {
     margin-left: 60px;
@@ -90,6 +89,9 @@ figure{
 .linediv { 
     flex-grow: 100;
 }
+#linecontainer{
+    height: 300px;
+}
 .piediv { 
     width: 300px;
 }
@@ -108,17 +110,24 @@ text.highcharts-credits {
     text-decoration: none;
     color: #000;
 }
-table {
-    border-collapse: collapse;
+.state-table tr {
+    cursor: pointer;
+    background-color: #ecf0f5;
 }
+.state-table thead tr {
+    cursor: pointer;
+    background-color: #e1e7ef;
+}
+.state-table tr:hover {
+    background-color: #d6dee9;
+}
+
 td, th {
-    border: 1px solid #dddddd;
     text-align: left;
     padding: 8px;
+    border-radius: 4px;
 }
-tr:nth-child(even) {
-    background-color: #dddddd;
-}
+
 .sources {
     padding: 10px;
     display: flex;
@@ -184,6 +193,9 @@ th[role=columnheader]:not(.no-sort):hover:after {
 /* table sort ends */
 
 @media only screen and (max-width: 600px) {
+    .no-mob{
+        display: none;
+    }
     .section-1,
     .section-2 {
         flex-direction: column;
@@ -198,7 +210,7 @@ th[role=columnheader]:not(.no-sort):hover:after {
         padding: 0 0 10px 0;
     }
     .statbox {
-        margin: 10px 0 0 0;
+        margin: 6px 0 0 0;
         flex-direction: column;
         width: 40%;
     }
@@ -207,21 +219,24 @@ th[role=columnheader]:not(.no-sort):hover:after {
         justify-content: space-between;
     }
     .increase{
-        margin-top: 11px;
+        margin-top: 7px;
     }
     .total {
-        font-size: 24px;
+        font-size: 20px;
     }
     .btn-section{
         text-align: center;
         margin: 0 0 20px 0;
     }
     .state-table{
-        font-size: 12px;
+        font-size: 0.8em;
         padding: 10px;
     }
     .state-table td,
     .state-table th {
-        padding: 6px 4px;
+        padding: 10px 4px;
+    }
+    .state-table table{
+        min-width: 100%;
     }
 }

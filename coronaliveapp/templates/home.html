@@ -1,78 +1,6 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
-    <title>Coronavirus India Live Updates</title>
-    <meta name="title" content="Coronavirus India Live Updates">
-    <meta name="description" content="Coronavirus latest updates to track the spread of Coronavirus (COVID-19) in India">
-    <meta name="keywords" content="coronavirus,corona,coronavirus in india,coronavirus india live,coronaindia,covid,covid19,pandemic,covidindia,india,virus">
-    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.1.5">
-</head>
-<body>
-    <div class="grey-back">
-        <div class="main">
-            <div class="overview">
-                <div class="statbox" id="confirmed-box">
-                    <div class="left">
-                        <div class="label">Confirmed</div>
-                        <div class="percentage">{{dict.info.percentageconfirmed}}% &#8593;</div>
-                    </div><div class="right">
-                        <div class="total">{{dict.info.confirmed}}</div>
-                        <div class="increase">[+{{dict.info.diffconfirmed}}]</div>
-                    </div>
-                </div>
-                <div class="statbox" id="active-box">
-                    <div class="left">
-                        <div class="label">Active</div>
-                        <div class="percentage">{{dict.info.percentageactive}}% &#8593;</div>
-                    </div>
-                    <div class="right">
-                        <div class="total">{{dict.info.active}}</div>
-                        <div class="increase">[+{{dict.info.diffactive}}]</div>
-                    </div>
-                </div>
-                <div class="statbox" id="recovered-box">
-                    <div class="left">
-                        <div class="label">Recovered</div>
-                        <div class="percentage">{{dict.info.percentagerecovered}}% &#8593;</div>
-                    </div>
-                    <div class="right">
-                        <div class="total">{{dict.info.recovered}}</div>
-                        <div class="increase">[+{{dict.info.diffrecovered}}]</div>
-                    </div>
-                </div>
-                <div class="statbox" id="death-box">
-                    <div class="left">
-                        <div class="label">Death</div>
-                        <div class="percentage">{{dict.info.percentagedeath}}% &#8593;</div>
-                    </div>
-                    <div class="right">
-                        <div class="total">{{dict.info.death}}</div>
-                        <div class="increase">[+{{dict.info.diffdeath}}]</div>
-                    </div>
-                </div>
-                <div class="statbox" id="totaltests-box">
-                    <div class="left">
-                        <div class="label">Tests</div>
-                    </div>
-                    <div class="right">
-                        <div class="total">144,910</div>
-                    </div>
-                </div>
-                <div class="statbox" id="permillion-box">
-                    <div class="left">
-                        <div class="label">Tests per million</div>
-                    </div>
-                    <div class="right">
-                        <div class="total">107</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{% include "cards/header.html" %}
+{% include "cards/overview.html" %}
     <div class="main">
         <div class="section-1">
             <div class="linediv">
@@ -105,7 +33,7 @@
                     <tbody id="statewise-tbody">
                         {% for state in states %}
                             <tr>
-                                <td><a class="statewise-links" href="{{state.urlkey}}-coronavirus-updates">{{state.name}}</a></td>
+                                <td><a href="{{state.urlkey}}-coronavirus-updates">{{state.name}}</a></td>
                                 <td>{{state.confirmed}}</td>
                                 <td>{{state.active}}</td>
                                 <td>{{state.discharged}}</td>
@@ -122,31 +50,4 @@
             </div>
         </div>
     </div>
-    <footer>
-        <div class="quote">
-            Let's fight Corona together!
-        </div>
-        <div class="sources">
-            <span class="source-title">Our Sources:</span>
-            <a class="source-link" href="https://www.mohfw.gov.in/">MoHFW</a>
-            <a class="source-link" href="https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_India">Wikipedia</a>
-            <a class="source-link" href="https://www.worldometers.info/coronavirus/country/india/">Worldometers</a>
-            <a class="source-link" href="https://www.covid19india.org/">covid19india</a>
-        </div>
-    </footer>
-</body>
-<script>
-    var data = {{data}};
-</script>
-<script defer src="https://code.highcharts.com/highcharts.js"></script>
-<script defer src="{% static 'js/table-sort.min.js' %}?v=1.0.0"></script>
-<script defer src="{% static 'js/main.js' %}?v=1.1.4"></script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-66396003-2"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-66396003-2');
-</script>
-</html>
-<!--compute={{compute}} from_cache={{from_cache}}-->
+{% include "cards/footer.html" %}

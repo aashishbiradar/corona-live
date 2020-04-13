@@ -7,121 +7,18 @@
     <title>Corona India Live Updates</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
     <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.8">
-    <style>
-
-
-        .sources {
-            width: 200px;
-            margin: 100px auto 40px auto;
-        }
-        .source-title {
-            font-family: sans-serif;
-            font-size: 18px;
-            text-align: center;
-            margin: 5px;
-        }
-        .our-sources {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .source-link {
-            border: #3498DB 1.5px solid;
-            border-radius: 22px;
-            text-decoration: none;
-            padding: 3px 5px;
-            font-size: 12px;
-            margin: 3px;
-            color: #3498DB;
-        }
-
-        table {
-        font-family: arial, sans-serif;
-        border-collapse: collapse;
-        width: 100%;
-        margin-bottom: 20px;
-        }
-
-
-        td, th {
-        border: 1px solid #dddddd;
-        text-align: left;
-        padding: 8px;
-        }
-
-        tr:nth-child(even) {
-        background-color: #dddddd;
-        }
-    </style>
 </head>
 <body>
+    {% include "cards/overview.html" %}
     <div class="main">
-        <div class="overview">
-            <div class="statbox" id="confirmed-box">
-                <div class="left">
-                    <div class="label">Confirmed</div>
-                    <div class="percentage">{{dict.info.percentageconfirmed}}% &#8593;</div>
-                </div><div class="right">
-                    <div class="total">{{dict.info.confirmed}}</div>
-                    <div class="increase">[+{{dict.info.diffconfirmed}}]</div>
-                </div>
-            </div>
-            <div class="statbox" id="active-box">
-                <div class="left">
-                    <div class="label">Active</div>
-                    <div class="percentage">{{dict.info.percentageactive}}% &#8593;</div>
-                </div>
-                <div class="right">
-                    <div class="total">{{dict.info.active}}</div>
-                    <div class="increase">[+{{dict.info.diffactive}}]</div>
-                </div>
-
-            </div>
-            <div class="statbox" id="recovered-box">
-                <div class="left">
-                    <div class="label">Recovered</div class="label">
-                    <div class="percentage">{{dict.info.percentagerecovered}}% &#8593;</div>
-                </div>
-                <div class="right">
-                    <div class="total">{{dict.info.recovered}}</div>
-                    <div class="increase">[+{{dict.info.diffrecovered}}]</div>
-                </div>
-            </div>
-            <div class="statbox" id="death-box">
-                <div class="left">
-                    <div class="label">Death</div class="label">
-                    <div class="percentage">{{dict.info.percentagedeath}}% &#8593;</div>
-                </div>
-                <div class="right">
-                    <div class="total">{{dict.info.death}}</div>
-                    <div class="increase">[+{{dict.info.diffdeath}}]</div>
-                </div>
-            </div>
-            <div class="statbox" id="totaltests-box">
-                <div class="left">
-                <div class="label">Tested<br>individuals</div>
-                </div>
-                <div class="right">
-                <div class="total">34,931</div>
-                </div>
-            </div>
-            <div class="statbox" id="permillion-box">
-                <div class="left">
-                <div class="label">Tests per million</div>
-                </div>
-                <div class="right">
-                <div class="total">27</div>
-                </div>
-            </div>
-        </div>
         <div class="section-1">
                 <div class="linediv">
                     <figure class="highcharts-line">
                         <div id="linecontainer"></div>
-                            <div class="btn-section">
+                            <!-- <div class="btn-section">
                                 <button class="graphtype-btn" id="cumulative-btn" type="button" onclick="plotcumulativegraph()">Cumulative</button>
                                 <button class="graphtype-btn" id="daily-btn" type="button" onclick="plotdailygraph()">Daily</button>
-                            </div>
+                            </div> -->
                     </figure>
                 </div>
                 <div class="piediv">
@@ -131,62 +28,27 @@
                 </div>
         </div>
         <div class="section-2">
+            <div class="state-table">
+                <table id="statewise-table">
+                    <thead>
+                        <tr>
+                         <th>District</th>
+                         <th>Confirmed</th>
+                       </tr>
+                    </thead>
+                    <tbody id='statewise-tbody'>
+                    </tbody>
+                </table>
+            </div>
             <div>
                 <figure class="highcharts-figure">
                     <div id="container"></div>
                 </figure>
             </div>
         </div>
-        <div>
-            <table id="statewise-table">
-                <thead>
-                    <tr>
-                     <th>District</th>
-                     <th>Confirmed</th>
-                   </tr>
-                </thead>
-                <tbody id='statewise-tbody'>
-                </tbody>
-            </table>
-        </div>
     </div>
-    <div class="sources">
-        <div class="source-title">Our Sources:</div>
-        <div class="our-sources">
-            <a class="source-link" href="https://www.mohfw.gov.in/">MoHFW</a>
-            <a class="source-link" href="https://www.worldometers.info/coronavirus/country/india/">Worldometers</a>
-            <a class="source-link" href="https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_India">Wikipedia</a>
-            <a class="source-link" href="https://www.covid19india.org/">covid19india</a>
-        </div>
-    </div>
-
-
-    <footer>
-        <div>
-            Let's fight Corona together!
-        </div>
-    </footer>
-</body>
+{% include "cards/footer.html" %}
 <script>
-    var data = {{data}};
-</script>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script>
-/*
-    var a=[];
-    for(i=0;i<40;i++)
-    {
-        a[i]=data.days.confirmed[i];
-    }
-    for(i=40;i<data.days.confirmed.length;i++)
-    {
-        a[i] = (a[i-1]*0.18+a[i-1]);
-    }
-    for (let i in a) {
-        a[i] = Math.ceil(a[i]);
-    }
-*/
-
     for (i = 0; i < data.statewise.state.length; i++) 
     {
         var table=document.getElementById('statewise-tbody');
@@ -196,265 +58,4 @@
         confirmed.innerHTML=data.statewise.active[i];
         state.innerHTML=data.statewise.state[i];
     }
-function plotdailygraph()
-{
-
-    document.getElementById('daily-btn').style.backgroundColor="grey";
-    document.getElementById('cumulative-btn').style.background="#3fb1cb";
-    document.getElementById('cumulative-btn').disabled= false;
-    document.getElementById('daily-btn').disabled= true;
-
-    Highcharts.chart('linecontainer', {
-    chart: {
-        type: 'column'
-    },
-    title: {
-        text: 'Corona India Timeline',
-        x:0,
-        y:80,
-        style: {
-            color: '#333333',
-            fontWeight: 'bold',
-            fontSize:'18px'
-        }
-    },
-    legend: {
-        layout: 'vertical',
-        align: 'left',
-        verticalAlign: 'top',
-        x: 150,
-        y: 100,
-        floating: true,
-        borderWidth: 1,
-        backgroundColor:
-            Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
-    },
-    xAxis: {
-        categories:data.days.date,
-        crosshair: true
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: 'Cases'
-        }
-    },
-
-    tooltip: {
-        shared: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: [{
-        name: 'Confirmed',
-        data: data.days.confirmedincrease,
-        color: '#3498db' ,
-    }, {
-        name: 'Recovered',
-        data: data.days.recoveredincrease,
-        color: '#27ae60'
-
-    }, {
-        name: 'Death',
-        data: data.days.deathincrease,
-        color: '#34495e'
-    }]
-});
-}
-
-
-function plotcumulativegraph()
-{
-    document.getElementById('daily-btn').style.backgroundColor= "#3fb1cb";
-    document.getElementById('cumulative-btn').style.backgroundColor= "grey";
-    document.getElementById('cumulative-btn').disabled= true;
-    document.getElementById('daily-btn').disabled= false;
-    Highcharts.chart('linecontainer', {
-    chart: {
-        type: 'area'
-    },
-    title: {
-        text: 'Corona India Timeline',
-        x:0,
-        y:80,
-        style: {
-            color: '#333333',
-            fontWeight: 'bold',
-            fontSize:'18px'
-        }
-    },
-    legend: {
-        layout: 'vertical',
-        align: 'left',
-        verticalAlign: 'top',
-        x: 150,
-        y: 100,
-        floating: true,
-        borderWidth: 1,
-        backgroundColor:
-            Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
-    },
-    xAxis: {
-        categories: data.days.date,
-        plotBands: [{
-            from: 53,
-            to:data.days.date.length,
-            color: 'rgba(68, 170, 213, .2)',
-            label: { 
-            text: '21 days lockdown', // Content of the label. 
-            align: 'center', // Positioning of the label. 
-            //Default to center. x: +10 // Amount of pixels the label will be repositioned according to the alignment. 
-            }
-        }]
-    },
-    yAxis: {
-        title: {
-            text: 'Cases'
-        }
-    },
-    tooltip: {
-        shared: true,
-    },
-    credits: {
-        enabled: false
-    },
-    plotOptions: {
-        area: {
-            fillOpacity: 0.5,
-            marker: {
-                enabled: false,
-                symbol: 'circle',
-                radius: 2,
-                states: {
-                    hover: {
-                        enabled: true
-                    }
-                }
-            }
-        },
-    },
-    series: [ 
-    {
-        name: 'Confirmed',
-        data: data.days.confirmed,
-        color: '#3498db'
-    },
-    {
-        name: 'Recovered',
-        data: data.days.recovered,
-        color: '#2ecc71'
-    },
-    {
-        name: 'Death',
-        data: data.days.death,
-        color: '#34495e'
-    }
-    ]
-});
-}
-
-plotcumulativegraph();
-
-
-Highcharts.chart('piecontainer', {
-    chart: {
-        type: 'pie',
-        height: 270
-    },
-    title: {
-        text: data.info.confirmed+' cases',
-        verticalAlign: 'middle',
-        floating:true,
-        x: 0,
-        y: -10,
-        style: {
-            color: '#333333',
-            fontWeight: 'bold',
-            fontSize:'18px'
-        }
-    },
-    plotOptions: {
-        pie: {
-            innerSize: 140,
-            depth: 25,
-            dataLabels: {
-                enabled: false
-            },
-            showInLegend: true,
-        }
-    },
-    series: [{
-        type: 'pie',
-        name: 'count',
-        data: [
-            {
-                name: 'Active',
-                y: data.info.active,
-                color: '#3498db'
-            },
-            {
-                name: 'Recovered',
-                y: data.info.recovered,
-                sliced: true,
-                selected: true,
-                color: '#2ecc71'
-            },
-            {
-                name: 'Death',
-                y: data.info.death,
-                color: '#34495e'
-            }
-        ]
-    }]
-});
-
-Highcharts.chart('container', {
-    chart: {
-        type: 'bar'
-    },
-    title: {
-        text: 'Districtwise Corona Cases',
-        style: {
-            color: '#333333',
-            fontWeight: 'bold',
-            fontSize:'18px'
-        }
-    },
-    xAxis: {
-        categories: data.statewise.state
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: 'Confirmed Cases'
-        }
-
-    },
-    legend: {
-        reversed: true,
-    },
-    plotOptions: {
-        series: {
-            stacking: 'normal'
-        }
-    },
-    series: [{
-        name: 'Confirmed',
-        data: data.statewise.active,
-        color: '#3498db'
-    }]
-});
 </script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-66396003-2"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-66396003-2');
-</script>
-</html>
-<!--compute={{compute}} from_cache={{from_cache}}-->
