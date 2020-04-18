@@ -192,6 +192,19 @@ th[role=columnheader]:not(.no-sort):hover:after {
 }
 /* table sort ends */
 
+/* Map  */
+
+#india-map {
+    height: 800px;
+    width: 800px;
+    margin-top: 20px;
+}
+.loading {
+    margin-top: 10em;
+    text-align: center;
+    color: gray;
+}
+
 @media only screen and (max-width: 600px) {
     .no-mob{
         display: none;
@@ -239,4 +252,13 @@ th[role=columnheader]:not(.no-sort):hover:after {
     .state-table table{
         min-width: 100%;
     }
+    #india-map {
+        height: 100%;
+        width: 100%;
+        margin-top: 10px;
+    }
+
 }
+
+
+
