@@ -1,7 +1,5 @@
 {% load static %}
-    <div class="twitter-box">
-        <a class="twitter-timeline" data-width="500px" href="https://twitter.com/coronaindia_ml?ref_src=twsrc%5Etfw">Tweets by coronaindia_ml</a>
-    </div>
+    <div class="twitter-box hidden"></div>
     <footer>
         <div class="quote">
             Let's fight Coronavirus together!
@@ -20,8 +18,7 @@
 <script defer src="https://code.highcharts.com/maps/modules/map.js"></script>
 <script defer src="{% static 'js/indiamap.js' %}?v=1.0.0"></script>
 <script defer src="{% static 'js/table-sort.min.js' %}?v=1.0.0"></script>
-<script defer src="{% static 'js/main.js' %}?v=1.1.7"></script>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<script defer src="{% static 'js/main.js' %}?v=1.1.8"></script>
 {% if not dict.envCfg.beta %}
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-66396003-2" crossorigin="anonymous"></script>
 <script>
