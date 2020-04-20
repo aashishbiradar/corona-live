@@ -1,0 +1,269 @@
+.hidden{
+    display: none;
+}
+.center{
+    text-align: center;
+}
+body{
+    margin: 0;
+    padding: 0;
+    font-family: arial,sans-serif;
+    user-select: none;
+}
+.main {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+.grey-back{
+    background: #ecf0f5;
+}
+.overview {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+.statbox{
+    display: flex;
+    justify-content: space-between;
+    background: #777;
+    min-width: 14.5%;
+    padding: 10px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 15px;
+}
+.btn-section {
+    margin-left: 60px;
+}
+.graphtype-btn {
+    color: #fff;
+    font-size: 14px;
+    padding: 6px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    width: 100px;
+}
+.graphtype-btn:hover {
+    background-color: purple;
+    color: #fff;
+}
+.right {
+    display: flex;
+}
+.total {
+    font-size: 30px;
+}
+.increase {
+    font-size: 11px;
+    margin-top: 15px;
+}
+#recovered-box {
+    background-image: linear-gradient(to right, #48d583,#1c7943);
+}
+#active-box {
+    background-image: linear-gradient(to right,#2790d7,#175681);
+}
+
+#death-box {
+    background-image: linear-gradient(to right,#4c6b8a,#1c2732);
+}
+#totaltests-box {
+    background-image: linear-gradient(to right,#a265bb,#623475);
+}
+#permillion-box {
+    background-image: linear-gradient(to right,#59bbd3,#3fb1cb);
+}
+#confirmed-box {
+    background-image: linear-gradient(to right,#ca538b,#7f2750);
+}
+figure{
+    margin: 0;
+}
+.section-1 {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.linediv { 
+    flex-grow: 100;
+}
+#linecontainer{
+    height: 300px;
+}
+.piediv { 
+    width: 300px;
+}
+.section-2{
+    display: flex;
+    padding:20px 0;
+}
+text.highcharts-credits {
+    display: none;
+}
+.state-table {
+    max-width: 100vw;
+    overflow: auto;
+}
+.state-table a{
+    text-decoration: none;
+    color: #000;
+}
+.state-table tr {
+    cursor: pointer;
+    background-color: #ecf0f5;
+}
+.state-table thead tr {
+    cursor: pointer;
+    background-color: #e1e7ef;
+}
+.state-table tr:hover {
+    background-color: #d6dee9;
+}
+
+td, th {
+    text-align: left;
+    padding: 8px;
+    border-radius: 4px;
+}
+.twitter-box {
+    text-align: center;
+    margin-top: 20px;
+    background: #e1f0fa;
+    padding: 30px 10px;
+}
+.sources {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.source-title {
+    font-size: 16px;
+    margin: 5px;
+}
+.source-link {
+    color: #fff;
+    border: #fff 1.5px solid;
+    border-radius: 22px;
+    text-decoration: none;
+    padding: 5px 10px 3px 10px;
+    font-size: 12px;
+    margin: 3px;
+    line-height: 1;
+}
+.quote{
+    font-size: 22px;
+    font-weight: bold;
+}
+footer{
+    background-color: #3498db;
+    text-align: center;
+    padding-top: 10px;
+    color: #fff;
+}
+
+/* table sort starts */
+th[role=columnheader]:not(.no-sort) {
+	cursor: pointer;
+}
+th[role=columnheader]:not(.no-sort):after {
+	content: '';
+	float: right;
+	margin-top: 7px;
+	border-width: 0 4px 4px;
+	border-style: solid;
+	border-color: #404040 transparent;
+	visibility: hidden;
+	opacity: 0;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+}
+th[aria-sort=ascending]:not(.no-sort):after {
+	border-bottom: none;
+	border-width: 4px 4px 0;
+}
+th[aria-sort]:not(.no-sort):after {
+	visibility: visible;
+	opacity: 0.4;
+}
+th[role=columnheader]:not(.no-sort):hover:after {
+	visibility: visible;
+	opacity: 1;
+}
+/* table sort ends */
+
+/* Map  */
+
+#india-map {
+    height: 800px;
+    width: 800px;
+    margin-top: 20px;
+}
+.loading {
+    margin-top: 10em;
+    text-align: center;
+    color: gray;
+}
+
+@media only screen and (max-width: 600px) {
+    .no-mob{
+        display: none;
+    }
+    .section-1,
+    .section-2 {
+        flex-direction: column;
+    }
+    .linediv { 
+        width: 100%;
+    }
+    .overview {
+        margin: 0;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
+        padding: 0 0 10px 0;
+    }
+    .statbox {
+        margin: 6px 0 0 0;
+        flex-direction: column;
+        width: 40%;
+    }
+    .left{
+        display: flex;
+        justify-content: space-between;
+    }
+    .increase{
+        margin-top: 7px;
+    }
+    .total {
+        font-size: 20px;
+    }
+    .btn-section{
+        text-align: center;
+        margin: 0 0 20px 0;
+    }
+    .state-table{
+        font-size: 0.8em;
+        padding: 10px;
+    }
+    .state-table td,
+    .state-table th {
+        padding: 10px 4px;
+    }
+    .state-table table{
+        min-width: 100%;
+    }
+    #india-map {
+        height: 100%;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+}
+
+
+

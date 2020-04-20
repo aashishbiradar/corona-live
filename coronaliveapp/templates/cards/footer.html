@@ -1,4 +1,7 @@
 {% load static %}
+    <div class="twitter-box">
+        <a class="twitter-timeline" data-width="500px" href="https://twitter.com/coronaindia_ml?ref_src=twsrc%5Etfw">Tweets by coronaindia_ml</a>
+    </div>
     <footer>
         <div class="quote">
             Let's fight Coronavirus together!
@@ -12,16 +15,14 @@
         </div>
     </footer>
 </body>
-<script>
-    var data = {{data}};
-</script>
+<script>var data = {{data}};</script>
 <script defer src="https://code.highcharts.com/highcharts.js"></script>
-<script defer src="https://code.highcharts.com/modules/no-data-to-display.js"></script>
-<script defer src="https://code.highcharts.com/highcharts-more.js"></script>
 <script defer src="https://code.highcharts.com/maps/modules/map.js"></script>
 <script defer src="{% static 'js/indiamap.js' %}?v=1.0.0"></script>
 <script defer src="{% static 'js/table-sort.min.js' %}?v=1.0.0"></script>
 <script defer src="{% static 'js/main.js' %}?v=1.1.7"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+{% if not dict.envCfg.beta %}
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-66396003-2" crossorigin="anonymous"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
@@ -29,5 +30,6 @@
     gtag('js', new Date());
     gtag('config', 'UA-66396003-2');
 </script>
+{% endif %}
 </html>
 <!--compute={{compute}} from_cache={{from_cache}}-->

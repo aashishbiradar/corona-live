@@ -1,5 +1,5 @@
 
-import requests, json, re, urllib.request, time, tweepy
+import requests, json, re, urllib.request, time, tweepy, copy
 
 import pandas as pd
 from datetime import datetime, date
@@ -18,7 +18,7 @@ from django.urls import reverse
 def home(req):
     t1 = time.time()
 
-    json_req = req.META['RAW_URI'] == '/json/'
+    json_req = req.META['PATH_INFO'] == '/json/'
 
     cache_key = 'homepage'
     expiry = 5 
@@ -34,9 +34,6 @@ def home(req):
             if json_req:
                 raise e
             cached_data = get_cache(cache_key)
-        
-    t2 = time.time()
-    compute = t2-t1
     
     if json_req:
         return JsonResponse(cached_data)
@@ -53,11 +50,17 @@ def home(req):
             'urlkey': cached_data['statewise']['urlkey'][i],
         })
     
+    data_dict = copy.deepcopy(cached_data)
+    data_dict['envCfg'] = get_env_cfg()
+
+    t2 = time.time()
+    compute = t2-t1
+    
     return render(req,'home.html',{
         'data': mark_safe(json.dumps(cached_data)),
         'compute': compute,
         'from_cache': from_cache,
-        'dict': cached_data,
+        'dict': data_dict,
         'states': states
     })
 
@@ -133,20 +136,22 @@ def adarsh(req):
         save_cache(cache_key, cached_data)
         from_cache= 'false'
 
-        
+    data_dict = cached_data
+    data_dict['envCfg'] = get_env_cfg()
+
     t2 = time.time()
     compute = t2-t1
     return render(req,'adarsh.html',{
         'data': mark_safe(json.dumps(cached_data)),
         'compute': compute,
         'from_cache': from_cache,
-        'dict': cached_data
+        'dict': data_dict
     })
 
 def stateupdate(req):
     t1 = time.time()
 
-    raw_uri = req.META['RAW_URI']
+    raw_uri = req.META['PATH_INFO']
     state_name = raw_uri.replace('/','').replace('-coronavirus-updates','').replace('-', ' ')
 
     data = get_state_data(state_name)
@@ -673,8 +678,8 @@ def get_data_from_covid19org():
     }
     
     tests = {
-        'samples' : '161,330',
-        'perMillion': 119
+        'samples' : '372,123',
+        'perMillion': '275'
     }
 
     return {
@@ -685,3 +690,10 @@ def get_data_from_covid19org():
         'type' : 'country'
     }
 
+def get_env_cfg():
+    beta = CONFIG.get('ENV') == 'BETA'
+    debug = CONFIG.get('DEBUG', False)
+    return {
+        'beta': beta,
+        'debug': debug
+    }
