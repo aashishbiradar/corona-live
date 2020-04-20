@@ -127,7 +127,12 @@ td, th {
     padding: 8px;
     border-radius: 4px;
 }
-
+.twitter-box {
+    text-align: center;
+    margin-top: 20px;
+    background: #e1f0fa;
+    padding: 30px 10px;
+}
 .sources {
     padding: 10px;
     display: flex;

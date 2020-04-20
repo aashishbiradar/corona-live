@@ -678,8 +678,8 @@ def get_data_from_covid19org():
     }
     
     tests = {
-        'samples' : '161,330',
-        'perMillion': 119
+        'samples' : '372,123',
+        'perMillion': '275'
     }
 
     return {
