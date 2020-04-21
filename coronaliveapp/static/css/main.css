@@ -17,6 +17,58 @@ body{
 .grey-back{
     background: #ecf0f5;
 }
+/* Heading btn */
+
+#permillion-box {
+	position: relative;
+}
+
+
+#permillion-box {
+        border: none;
+        display: block;
+        border-radius: 5px;
+        text-align: center;
+        cursor: pointer;
+        text-transform: uppercase;
+        overflow: hidden;
+        position: relative;
+        color: #fff;
+        font-weight: 700;
+        font-size: 15px;
+        background-color: #222;
+}
+
+#permillion-box h1 {
+  position: relative; 
+  z-index: 1;
+  font-size: 1em;
+}
+
+#permillion-box:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 490%;
+  width: 140%;
+  background: #9b59b6;
+  -webkit-transition: all .5s ease-in-out;
+  transition: all .5s ease-in-out;
+  -webkit-transform: translateX(-98%) translateY(-25%) rotate(45deg);
+  transform: translateX(-98%) translateY(-25%) rotate(45deg);
+}
+
+#permillion-box:hover:after {
+  -webkit-transform: translateX(-9%) translateY(-25%) rotate(45deg);
+  transform: translateX(-9%) translateY(-25%) rotate(45deg);
+}
+
+
+/*Heading btn end */
+
+
+
 .overview {
     display: flex;
     justify-content: space-between;
@@ -72,12 +124,11 @@ body{
 #totaltests-box {
     background-image: linear-gradient(to right,#a265bb,#623475);
 }
-#permillion-box {
-    background-image: linear-gradient(to right,#59bbd3,#3fb1cb);
-}
 #confirmed-box {
     background-image: linear-gradient(to right,#ca538b,#7f2750);
 }
+
+
 figure{
     margin: 0;
 }
@@ -197,6 +248,20 @@ th[role=columnheader]:not(.no-sort):hover:after {
 }
 /* table sort ends */
 
+/* For deltaconfirmed */
+.deltaconfirmed {
+    color: red;
+    font-size: 12px;
+}
+.deltarecovered {
+    color: #48d583;
+    font-size: 12px;
+}
+.deltadeath {
+    color : #000000;
+    font-size: 12px;
+}
+
 /* Map  */
 
 #india-map {
@@ -213,6 +278,12 @@ th[role=columnheader]:not(.no-sort):hover:after {
 @media only screen and (max-width: 600px) {
     .no-mob{
         display: none;
+    }
+    #permillion-box {
+        width: 100%;
+        height: 30px;
+        margin-left: 13.5px;
+        margin-right: 13.5px;
     }
     .section-1,
     .section-2 {

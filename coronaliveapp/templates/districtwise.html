@@ -4,11 +4,12 @@
 <head>  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corona India Live Updates</title>
+    <title>Corona {{type}} Live Updates</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
-    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.8">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.9">
 </head>
 <body>
+
     {% include "cards/overview.html" %}
     <div class="main">
         <div class="section-1">
@@ -37,6 +38,20 @@
                        </tr>
                     </thead>
                     <tbody id='statewise-tbody'>
+                        {% for state in states %}
+                            <tr>
+                                {% if state.name == "Unknown"%}
+                                <td title="districtwise information is yet to arrive">{{state.name}}</td>
+                                {% else %}
+                                <td>{{state.name}}</td>
+                                {% endif %}
+                                <td data-sort="{{state.confirmed}}">{{state.confirmed}} 
+                                    {% if state.deltaconfirmed != 0 %} 
+                                    <span class="deltaconfirmed">{{state.deltaconfirmed}} &#8593;</span>
+                                    {% endif %}
+                                </td >
+                           </tr>
+                        {% endfor %}                        
                     </tbody>
                 </table>
             </div>
@@ -48,14 +63,3 @@
         </div>
     </div>
 {% include "cards/footer.html" %}
-<script>
-    for (i = 0; i < data.statewise.state.length; i++) 
-    {
-        var table=document.getElementById('statewise-tbody');
-        var row=table.insertRow(i);
-        var state=row.insertCell(0);
-        var confirmed=row.insertCell(1)
-        confirmed.innerHTML=data.statewise.active[i];
-        state.innerHTML=data.statewise.state[i];
-    }
-</script>

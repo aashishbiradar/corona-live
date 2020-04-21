@@ -45,6 +45,9 @@ def home(req):
             'name': cached_data['statewise']['state'][i],
             'confirmed': cached_data['statewise']['confirmed'][i],
             'active': cached_data['statewise']['active'][i],
+            'deltaconfirmed' : cached_data['statewise']['deltaconfirmed'][i],
+            'deltadeaths' : cached_data['statewise']['deltadeaths'][i],
+            'deltarecovered' : cached_data['statewise']['deltarecovered'][i],
             'discharged': cached_data['statewise']['discharged'][i],
             'death': cached_data['statewise']['death'][i],
             'urlkey': cached_data['statewise']['urlkey'][i],
@@ -61,7 +64,8 @@ def home(req):
         'compute': compute,
         'from_cache': from_cache,
         'dict': data_dict,
-        'states': states
+        'states': states,
+        'type' : 'country'
     })
 
 
@@ -86,7 +90,7 @@ def adarsh(req):
         present_data = statewise_dataframe[statewise_dataframe['state']=='Total']
 
         info = {
-            'active' : int(present_data['active'].sum()),
+            'active' : format_as_indian(int(present_data['active'].sum())),
             'confirmed' : int(present_data['confirmed'].sum()),
             'death' : int(present_data['deaths'].sum()),
             'recovered' : int(present_data['recovered'].sum())
@@ -160,14 +164,25 @@ def stateupdate(req):
         raise Http404()
     from_cache= 'false'
     
+    states = []
+    for i in  range(len(data['statewise']['state'])):
+        states.append({
+            'name': data['statewise']['state'][i],
+            'confirmed': data['statewise']['confirmed'][i],
+            'deltaconfirmed' : data['statewise']['deltaconfirmed'][i]
+        })
+
     t2 = time.time()
     compute = t2-t1
+
     
     return render(req,'districtwise.html',{
         'data': mark_safe(json.dumps(data)),
         'compute': compute,
         'from_cache': from_cache,
-        'dict': data
+        'dict': data,
+        'states' : states,
+        'type' : state_name
     })
 
 
@@ -450,17 +465,20 @@ def get_state_data(state_name):
 
     districts = []
     confirmed = []
+    deltaconfirmed = []
 
     for district in state['districtData']:
         districts.append(district)
         confirmed.append(state['districtData'][district]['confirmed'])
+        deltaconfirmed.append(state['districtData'][district]['delta']['confirmed'])
 
-    data=pd.DataFrame(zip(districts,confirmed),columns=['state','confirmed'])
+    data=pd.DataFrame(zip(districts,confirmed,deltaconfirmed),columns=['state','confirmed','deltaconfirmed'])
     data.sort_values(by=['confirmed'],axis=0,inplace=True,ascending=False)
 
     statewise = {
         'state' : data['state'].tolist(),
-        'active' : data['confirmed'].tolist()
+        'confirmed' : data['confirmed'].tolist(),
+        'deltaconfirmed' : data['deltaconfirmed'].tolist()
     }
 
     tests = None
@@ -470,7 +488,7 @@ def get_state_data(state_name):
         'info': info,
         'days': days,
         'tests': tests,
-        'type' : 'state'
+        'type' : state_name
     }
 
     return data
@@ -541,7 +559,8 @@ def get_info_details(present_data):
     elif((info['active']-info['diffactive'])==0):
         info['percentageactive']=""
     else:
-        info['percentageactive']=int((info['diffactive']*100)/(info['active']-info['diffactive']))
+        info['percentageactive']=int(abs((info['diffactive']*100)/(info['active']-info['diffactive'])))
+    ####
     
     return info
 
@@ -636,7 +655,12 @@ def get_urlkey(string):
 
 def get_data_from_covid19org():
     url = 'https://api.covid19india.org/data.json'
+
+    ## Tests
     country_json = requests.get(url).json()
+    tests=pd.DataFrame(country_json['tested'])
+    test = tests['totalsamplestested'].tolist()
+    totaltests = max(list(map(get_count,test)))
 
     statewise_dataframe = pd.DataFrame(country_json['statewise'])
 
@@ -658,6 +682,9 @@ def get_data_from_covid19org():
         'statecode' : statewise_dataframe['statecode'].apply(str.lower).tolist(),
         'active' : statewise_dataframe['active'].apply(int).tolist(),
         'confirmed':statewise_dataframe['confirmed'].apply(int).tolist(),
+        'deltaconfirmed' : statewise_dataframe['deltaconfirmed'].apply(int).tolist(),
+        'deltadeaths' : statewise_dataframe['deltadeaths'].apply(int).tolist(),
+        'deltarecovered' : statewise_dataframe['deltarecovered'].apply(int).tolist(),
         'death' : statewise_dataframe['deaths'].apply(int).tolist(),
         'discharged' : statewise_dataframe['recovered'].apply(int).tolist(),
         'urlkey': statewise_dataframe['urlkey'].tolist()
@@ -678,8 +705,8 @@ def get_data_from_covid19org():
     }
     
     tests = {
-        'samples' : '372,123',
-        'perMillion': '275'
+        'samples' : format_as_indian(totaltests),
+        'perMillion': format_as_indian(totaltests//1300)
     }
 
     return {
@@ -697,3 +724,21 @@ def get_env_cfg():
         'beta': beta,
         'debug': debug
     }
+
+
+
+def format_as_indian(input):
+    input_list = list(str(input))
+    if len(input_list) <= 1:
+        formatted_input = input
+    else:
+        first_number = input_list.pop(0)
+        last_number = input_list.pop()
+        formatted_input = first_number + (
+            (''.join(l + ',' * (n % 2 == 1) for n, l in enumerate(reversed(input_list)))[::-1] + last_number)
+        )
+
+        if len(input_list) % 2 == 0:
+            formatted_input.lstrip(',')
+
+    return formatted_input

@@ -34,10 +34,24 @@
                         {% for state in states %}
                             <tr>
                                 <td><a href="{{state.urlkey}}-coronavirus-updates">{{state.name}}</a></td>
-                                <td>{{state.confirmed}}</td>
+                                <td data-sort="{{state.confirmed}}">{{state.confirmed}} 
+                                    {% if state.deltaconfirmed != 0 %} 
+                                    <span class="deltaconfirmed">{{state.deltaconfirmed}} &#8593;</span>
+                                    {% endif %}
+                                </td >
                                 <td>{{state.active}}</td>
-                                <td>{{state.discharged}}</td>
-                                <td>{{state.death}}</td>
+                                
+                                <td data-sort="{{state.discharged}}">{{state.discharged}}
+                                {% if state.deltarecovered != 0 %} 
+                                <span class="deltarecovered">{{state.deltarecovered}} &#8593;</span>
+                                {% endif %}
+                                </td>
+                                
+                                <td data-sort="{{state.death}}">{{state.death}}
+                                {% if state.deltadeaths != 0 %}
+                                <span class="deltadeath">{{state.deltadeaths}} &#8593;</span>
+                                {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>

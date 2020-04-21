@@ -1,43 +1,70 @@
 <div class="grey-back">
     <div class="main">
         <div class="overview">
+            <div class="statbox" id="permillion-box" onclick= "window.location.href = '/'">
+                    <h1>Coronavirus India</h1>
+            </div>
             <div class="statbox" id="confirmed-box">
                 <div class="left">
                     <div class="label">Confirmed</div>
+                    {% if dict.info.diffconfirmed != 0 %}
                     <div class="percentage">{{dict.info.percentageconfirmed}}% &#8593;</div>
+                    {% endif %}
                 </div><div class="right">
                     <div class="total">{{dict.info.confirmed}}</div>
+                    {% if dict.info.diffconfirmed != 0 %}
                     <div class="increase">[+{{dict.info.diffconfirmed}}]</div>
+                    {% endif %}
                 </div>
             </div>
             <div class="statbox" id="active-box">
                 <div class="left">
                     <div class="label">Active</div>
+                    {% if dict.info.diffactive < 0 %}
+                    <div class="percentage">{{dict.info.percentageactive}}% &#8595;</div>
+                    {% elif dict.info.diffactive == 0 %}
+                    <div class="percentage"></div>
+                    {% else %}
                     <div class="percentage">{{dict.info.percentageactive}}% &#8593;</div>
+                    {% endif %}
                 </div>
                 <div class="right">
                     <div class="total">{{dict.info.active}}</div>
+                    {% if dict.info.diffactive < 0  %}
+                    <div class="increase">[{{dict.info.diffactive}}]</div>
+                    {% elif dict.info.diffactive == 0 %}
+                    <div class="increase"></div>
+                    {% else %}
                     <div class="increase">[+{{dict.info.diffactive}}]</div>
+                    {% endif %}
                 </div>
             </div>
             <div class="statbox" id="recovered-box">
                 <div class="left">
                     <div class="label">Recovered</div>
+                    {% if dict.info.diffrecovered != 0 %}
                     <div class="percentage">{{dict.info.percentagerecovered}}% &#8593;</div>
+                    {% endif %}
                 </div>
                 <div class="right">
                     <div class="total">{{dict.info.recovered}}</div>
+                    {% if dict.info.diffrecovered != 0 %}
                     <div class="increase">[+{{dict.info.diffrecovered}}]</div>
+                    {% endif %}
                 </div>
             </div>
             <div class="statbox" id="death-box">
                 <div class="left">
                     <div class="label">Death</div>
+                    {% if dict.info.diffdeath != 0%}
                     <div class="percentage">{{dict.info.percentagedeath}}% &#8593;</div>
+                    {% endif %}
                 </div>
                 <div class="right">
                     <div class="total">{{dict.info.death}}</div>
+                    {% if dict.info.diffdeath != 0%}
                     <div class="increase">[+{{dict.info.diffdeath}}]</div>
+                    {% endif %}
                 </div>
             </div>
             {% if dict.tests %}
@@ -47,14 +74,6 @@
                 </div>
                 <div class="right">
                     <div class="total">{{dict.tests.samples}}</div>
-                </div>
-            </div>
-            <div class="statbox" id="permillion-box">
-                <div class="left">
-                    <div class="label">Tests per million</div>
-                </div>
-                <div class="right">
-                    <div class="total">{{dict.tests.perMillion}}</div>
                 </div>
             </div>
             {% endif %}

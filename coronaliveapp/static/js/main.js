@@ -70,6 +70,17 @@ function plotDailyGraph()
     });
 }
 
+
+function get_title()
+{
+    if(data.type == "country")
+    {
+        return "Corona India Timeline"
+    }
+    else
+        return "Corona " + data.type + " Timeline";
+}
+
 function plotCumulativeGraph()
 {
     Highcharts.chart('linecontainer', {
@@ -77,7 +88,7 @@ function plotCumulativeGraph()
             type: 'area'
         },
         title: {
-            text: 'Corona India Timeline',
+            text: get_title(),
             x:0,
             y:85,
             style: {
@@ -228,7 +239,7 @@ Highcharts.chart('piecontainer', {
     }]
 });
 
-if(data.type == "state")
+if(data.type != "country")
 {
     var stateChartHeight = (Math.max((data.statewise.state.length * 36),200) + 'px');
     Highcharts.chart('container', {
@@ -263,17 +274,9 @@ if(data.type == "state")
             }
         },
         series: [{
-            name: 'Active',
-            data: data.statewise.active,
+            name: 'Confirmed',
+            data: data.statewise.confirmed,
             color: '#3498db'
-        }, {
-            name: 'Recovered',
-            data: data.statewise.discharged,
-            color: '#2ecc71'
-        }, {
-            name: 'Death',
-            data: data.statewise.death,
-            color: '#34495e'
         }]
     });
 }
@@ -360,8 +363,10 @@ function mapFunction()
     });    
 }
 
-mapFunction()
-
+if(data.type == 'country')
+{
+    mapFunction()
+}
 
 // load twitter timeline on scroll
 var twitterLoaded = false;
