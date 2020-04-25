@@ -73,12 +73,7 @@ function plotDailyGraph()
 
 function get_title()
 {
-    if(data.type == "country")
-    {
-        return "Corona India Timeline"
-    }
-    else
-        return "Corona " + data.type + " Timeline";
+    return "Corona " + data.type + " Timeline";
 }
 
 function plotCumulativeGraph()
@@ -239,7 +234,7 @@ Highcharts.chart('piecontainer', {
     }]
 });
 
-if(data.type != "country")
+if(data.type != "India")
 {
     var stateChartHeight = (Math.max((data.statewise.state.length * 36),200) + 'px');
     Highcharts.chart('container', {
@@ -363,7 +358,7 @@ function mapFunction()
     });    
 }
 
-if(data.type == 'country')
+if(data.type == 'India')
 {
     mapFunction()
 }

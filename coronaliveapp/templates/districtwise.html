@@ -1,16 +1,6 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>  
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corona {{type}} Live Updates</title>
-    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
-    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.9">
-</head>
-<body>
-
-    {% include "cards/overview.html" %}
+{% include "cards/header.html" %}
+{% include "cards/overview.html" %}
     <div class="main">
         <div class="section-1">
                 <div class="linediv">
@@ -46,7 +36,7 @@
                                 <td>{{state.name}}</td>
                                 {% endif %}
                                 <td data-sort="{{state.confirmed}}">{{state.confirmed}} 
-                                    {% if state.deltaconfirmed != 0 %} 
+                                    {% if state.deltaconfirmed > 0 %} 
                                     <span class="deltaconfirmed">{{state.deltaconfirmed}} &#8593;</span>
                                     {% endif %}
                                 </td >

@@ -65,7 +65,8 @@ def home(req):
         'from_cache': from_cache,
         'dict': data_dict,
         'states': states,
-        'type' : 'country'
+        'type' : 'India',
+        'url' : "https://www.coronaindia.ml/"
     })
 
 
@@ -182,7 +183,8 @@ def stateupdate(req):
         'from_cache': from_cache,
         'dict': data,
         'states' : states,
-        'type' : state_name
+        'type' : data['type'],
+        'url' : "https://www.coronaindia.ml"+raw_uri
     })
 
 
@@ -374,7 +376,7 @@ def tweet_update(latest_data):
             "Know more: https://coronaindia.ml\n\n"
             "#COVID #COVID19Pandemic "
             "#coronaupdatesindia  #coronavirus "
-            "#COVID19outbreak".format(latest_data['confirmed'],latest_data['infected'],latest_data['cured'],latest_data['death']))
+            "#COVID19outbreak".format(latest_data['confirmed'],latest_data['active'],latest_data['recovered'],latest_data['death']))
     api.update_status(status =tweet)
 
 
@@ -714,7 +716,7 @@ def get_data_from_covid19org():
         'info': info,
         'days': days,
         'tests': tests,
-        'type' : 'country'
+        'type' : 'India'
     }
 
 def get_env_cfg():
