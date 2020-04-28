@@ -209,6 +209,9 @@ Highcharts.chart('piecontainer', {
             showInLegend: true,
         }
     },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.2f}%)'
+    },
     series: [{
         type: 'pie',
         name: 'count',

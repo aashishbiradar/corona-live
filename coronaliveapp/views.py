@@ -427,6 +427,9 @@ def get_state_data(state_name):
     recovered = []
     death = []
     
+    #### Date format
+    dates = [datetime.strptime(x,'%d-%b-%y') for x in dates]
+    dates = [x.strftime("%b %d") for x in dates]
     
     for change in changes:
         if(change['status']=='Confirmed'):
@@ -448,17 +451,17 @@ def get_state_data(state_name):
     for i in range(1,len(active)):
         activeincrease.append(active[i]-active[i-1])
 
-
+    previous = -30
     days = {
-        'date' : dates,
-        'confirmed' : confirmed,
-        'recovered' : recovered,
-        'death' : death,
-        'active' : active,
-        'confirmedincrease' : confirmedincrease,
-        'recoveredincrease' : recoveredincrease,
-        'deathincrease' : deathincrease,
-        'activeincrease' : activeincrease
+        'date' : dates[previous:],
+        'confirmed' : confirmed[previous:],
+        'recovered' : recovered[previous:],
+        'death' : death[previous:],
+        'active' : active[previous:],
+        'confirmedincrease' : confirmedincrease[previous:],
+        'recoveredincrease' : recoveredincrease[previous:],
+        'deathincrease' : deathincrease[previous:],
+        'activeincrease' : activeincrease[previous:]
     }
 
     statewise_json = requests.get(statewise_json_url).json()
