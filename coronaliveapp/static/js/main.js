@@ -249,10 +249,10 @@ Highcharts.chart('piecontainer', {
     }]
 });
 
-if(data.type != "India")
+if(false)
 {
     var stateChartHeight = (Math.max((data.statewise.state.length * 36),200) + 'px');
-    Highcharts.chart('container', {
+    Highcharts.chart('statemap', {
         chart: {
             type: 'bar',
             height: stateChartHeight
@@ -357,9 +357,8 @@ function mapFunction()
                 lineWidth: 10,
             },
         legend: {
-            layout: 'vertical',
-            align: 'right',
-            floating: true,
+            layout: 'horizontal',
+            align: 'center',
         },
     
         series: [{
@@ -420,7 +419,7 @@ function plotStateMap(geojson)
         color: 'red'
     }];
 
-    Highcharts.mapChart('container', {
+    Highcharts.mapChart('statemap', {
         chart: {
             map: geojson,
         },
@@ -453,11 +452,11 @@ function plotStateMap(geojson)
     });
 }
 
-if(data.type=="Karnataka")
+if(data.type != "India")
 {
-    loadJson('/static/maps/karnataka.json',function(geojson){
+    var statekey = data.type.toLowerCase().replace(/ /g,"")
+    loadJson('/static/maps/'+statekey+'.json',function(geojson){
         plotStateMap(geojson);
-        //zone_map(geojson);
     });
 }
 // state timeline

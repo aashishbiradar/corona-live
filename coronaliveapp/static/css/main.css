@@ -260,11 +260,15 @@ th[role=columnheader]:not(.no-sort):hover:after {
     font-size: 12px;
 }
 
-/* Map  */
-
-#india-map {
+.india-map {
     height: 700px;
     width: 700px;
+}
+.state-map{
+    height: 500px;
+}
+.india-map,
+.state-map {
     margin-top: 20px;
     position: sticky;
     top: 0;
@@ -277,6 +281,10 @@ th[role=columnheader]:not(.no-sort):hover:after {
 
 
 @media only screen and (max-width: 600px) {
+    .mob-reverse{
+        display: flex;
+        flex-direction: column-reverse;
+    }
     .no-mob{
         display: none;
     }
@@ -286,8 +294,7 @@ th[role=columnheader]:not(.no-sort):hover:after {
         margin-left: 13.5px;
         margin-right: 13.5px;
     }
-    .section-1,
-    .section-2 {
+    .section-1{
         flex-direction: column;
     }
     .linediv { 
@@ -318,6 +325,9 @@ th[role=columnheader]:not(.no-sort):hover:after {
         text-align: center;
         margin: 0 0 20px 0;
     }
+    .section-2{
+        padding: 0;
+    }
     .state-table{
         font-size: 0.8em;
         padding: 10px;
@@ -329,10 +339,12 @@ th[role=columnheader]:not(.no-sort):hover:after {
     .state-table table{
         min-width: 100%;
     }
-    #india-map {
+    .india-map,
+    .state-map {
         height: 100%;
         width: 100%;
-        margin-top: 10px;
+        margin-top: 0;
+        position: unset;
     }
 }
 

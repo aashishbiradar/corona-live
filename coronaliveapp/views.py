@@ -536,7 +536,7 @@ def get_state_data(state_name):
     r = requests.get('https://api.covid19india.org/zones.json')
     r = r.json()['zones']
     df = pd.DataFrame(r)
-    state_df = df[df['state']=='Karnataka']
+    state_df = df[df['state']==state_name]
     green = state_df['district'][state_df['zone']=='Green']
     orange = state_df['district'][state_df['zone']=='Orange']
     red = state_df['district'][state_df['zone']=='Red']
