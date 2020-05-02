@@ -395,7 +395,7 @@ window.addEventListener("scroll", function(){
         s.async = true;
         s.src = "https://platform.twitter.com/widgets.js";
         d.body.appendChild(s);
-        twitterBox.style.display = 'block';
+        s.onload = function () { twitterBox.style.display = 'block'; };
         twitterLoaded = true;
     }
 }, false)

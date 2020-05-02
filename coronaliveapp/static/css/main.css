@@ -268,6 +268,8 @@ th[role=columnheader]:not(.no-sort):hover:after {
     height: 800px;
     width: 800px;
     margin-top: 20px;
+    position: sticky;
+    top: 0;
 }
 .loading {
     margin-top: 10em;
