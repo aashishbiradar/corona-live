@@ -1,5 +1,17 @@
 var d = document;
 
+//load json
+var loadJson = function (url, onload) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+             onload(JSON.parse(this.responseText));
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.send();
+};
+
 function plotDailyGraph()
 {
 
@@ -373,36 +385,36 @@ if(data.type == 'India')
 }
 // state timeline
 
-var states = [];
-var marked_states =['Karnataka','Maharashtra','Gujarat','Delhi','Rajasthan']
-for(i in data.statewise_daily)
+  
+
+function plotStatewiseTimeline(timelineData)
+{
+    var states = [];
+    var marked_states =['Karnataka','Maharashtra','Gujarat','Delhi','Rajasthan']
+    for(i in timelineData)
     {
         if(i != 'date' && i!= 'Total')
         {
             if(marked_states.includes(i))
             {
-                console.log(i)
                 details = {
                     name: i,
-                    data: data.statewise_daily[i],
+                    data: timelineData[i],
                 }
                 states.push(details)
             }
             else
                 {
-                    console.log(i)
                     details = {
                         name: i,
-                        data: data.statewise_daily[i],
+                        data: timelineData[i],
                         visible:false
                     }
                     states.push(details)
                 }
         }
-    }   
+    } 
 
-function plotStatewiseTimeline(states)
-{
     Highcharts.chart('statetimeline-confirmed', {
         chart: {
             type: 'areaspline',
@@ -422,7 +434,7 @@ function plotStatewiseTimeline(states)
                 Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
         },
         xAxis: {
-            categories: data.statewise_daily.date,
+            categories: timelineData.date,
         },
         yAxis: {
             title: {
@@ -452,12 +464,9 @@ function plotStatewiseTimeline(states)
     }); 
 }
 
-if(data.type == "India")
-{
-    plotStatewiseTimeline(states)
-}
-
-
+window.innerWidth > 700 
+&& data.type == "India" 
+&& loadJson('/statewise-timeline/', function(d){plotStatewiseTimeline(d);});
 
 // load twitter timeline on scroll
 var twitterLoaded = false;
@@ -495,20 +504,4 @@ window.addEventListener("scroll", function(){
         twitterLoaded = true;
     }
 }, false)
-
-//load json
-function loadJson(url, onload) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-             onload(JSON.parse(this.responseText));
-        }
-        else {
-            console.error(this);
-        }
-    };
-    xhttp.open("GET", url, true);
-    xhttp.send();
-}
-
 
