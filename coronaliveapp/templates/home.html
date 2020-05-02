@@ -1,7 +1,7 @@
 {% load static %}
 {% include "cards/header.html" %}
 {% include "cards/overview.html" %}
-    <div class="main">
+    <div class="main mob-reverse">
         <div class="section-1">
             <div class="linediv">
                 <figure class="highcharts-line">
@@ -18,7 +18,7 @@
                 </figure>
             </div>
         </div>
-        <div class="section-2">
+        <div class="section-2 mob-reverse">
             <div class="state-table">
                 <table id="statewise-table">
                     <thead>
@@ -57,7 +57,7 @@
                     </tbody>
                 </table>
             </div>
-            <div id="india-map"></div>
+            <div id="india-map" class="india-map"></div>
         </div>
         <div class="statewise-timeline">
             <figure class="highcharts-figure">
