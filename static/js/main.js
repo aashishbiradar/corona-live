@@ -199,6 +199,9 @@ Highcharts.chart('piecontainer', {
             fontSize:'18px'
         }
     },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.2f}%)'
+    },
     plotOptions: {
         pie: {
             innerSize: 140,
@@ -208,9 +211,6 @@ Highcharts.chart('piecontainer', {
             },
             showInLegend: true,
         }
-    },
-    tooltip: {
-        pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.2f}%)'
     },
     series: [{
         type: 'pie',
@@ -339,16 +339,11 @@ function mapFunction()
         colorAxis: {
                 min: 0,
                 max: data.statewise.confirmed[0],
-                minColor: '#FFFFFF',
+                minColor: '#c6dbef',
                 maxColor: '#08306b',
                 lineColor: 'white',
-                lineWidth: 10,
+                lineWidth: 10
             },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            floating: true,
-        },
     
         series: [{
             data: mapdata,
@@ -366,98 +361,10 @@ function mapFunction()
     });    
 }
 
-
 if(data.type == 'India')
 {
     mapFunction()
 }
-// state timeline
-
-var states = [];
-var marked_states =['Karnataka','Maharashtra','Gujarat','Delhi','Rajasthan']
-for(i in data.statewise_daily)
-    {
-        if(i != 'date' && i!= 'Total')
-        {
-            if(marked_states.includes(i))
-            {
-                console.log(i)
-                details = {
-                    name: i,
-                    data: data.statewise_daily[i],
-                }
-                states.push(details)
-            }
-            else
-                {
-                    console.log(i)
-                    details = {
-                        name: i,
-                        data: data.statewise_daily[i],
-                        visible:false
-                    }
-                    states.push(details)
-                }
-        }
-    }   
-
-function plotStatewiseTimeline(states)
-{
-    Highcharts.chart('statetimeline-confirmed', {
-        chart: {
-            type: 'areaspline',
-            height: 600
-        },
-        title: {
-            text: 'Statewise Confirmed  Cases Timeline'
-        },
-        legend: {
-            align: 'right',
-            verticalAlign: 'top',
-            layout: 'vertical',
-            x: 0,
-            y: 0,
-            borderWidth: 1,
-            backgroundColor:
-                Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
-        },
-        xAxis: {
-            categories: data.statewise_daily.date,
-        },
-        yAxis: {
-            title: {
-                text: ''
-            }
-        },
-        tooltip: {
-            shared: true,
-            valueSuffix: ' '
-        },
-        credits: {
-            enabled: false
-        },
-        plotOptions: {
-            areaspline: {
-                fillOpacity: 0
-            },
-            series: {
-                marker: {
-                    enabled: false,
-                    symbol: "circle",
-                    radius: 2
-                }
-            }
-        },
-        series: states
-    }); 
-}
-
-if(data.type == "India")
-{
-    plotStatewiseTimeline(states)
-}
-
-
 
 // load twitter timeline on scroll
 var twitterLoaded = false;
@@ -491,9 +398,7 @@ window.addEventListener("scroll", function(){
         s.async = true;
         s.src = "https://platform.twitter.com/widgets.js";
         d.body.appendChild(s);
-        s.onload = function () { twitterBox.style.display = 'block'; };
+        twitterBox.style.display = 'block';
         twitterLoaded = true;
     }
 }, false)
-
-
