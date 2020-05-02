@@ -22,5 +22,6 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('json/', views.home, name='home'),
     re_path(r'^[a-z-]+-coronavirus-updates/$',views.stateupdate, name='stateupdate'),
-    path('ping/', views.ping, name='ping')
+    path('ping/', views.ping, name='ping'),
+    path('statewise-timeline/', views.statewise_timeline, name='statewise')
 ]

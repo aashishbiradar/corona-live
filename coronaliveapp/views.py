@@ -25,7 +25,7 @@ def home(req):
     cached_data = get_cache(cache_key, expiry)
     from_cache= 'true'
 
-    if True or not cached_data:
+    if not cached_data:
         try:
             cached_data = get_data_from_covid19org()
             save_cache(cache_key, cached_data)
@@ -69,6 +69,55 @@ def home(req):
         'url' : "https://www.coronaindia.ml/"
     })
 
+def statewise_timeline(req):
+
+    cache_key = 'statewise_timeline'
+    expiry = 60
+    cached_data = get_cache(cache_key, expiry)
+
+    if not cached_data:
+        try:
+            url = 'https://api.covid19india.org/data.json'
+            country_json = requests.get(url).json()
+
+            statewise_dataframe = pd.DataFrame(country_json['statewise'])
+            statenames = statewise_dataframe[['state','statecode']]
+            statenames['statecode'] = statenames['statecode'].apply(str.lower)
+
+            ### Statewise timeline
+            state_daily_url = "https://api.covid19india.org/states_daily.json"
+            statewise_timeline = requests.get(state_daily_url).json()
+            statewise_df = pd.DataFrame(statewise_timeline['states_daily'])
+            statewise_confirmed_df = statewise_df[statewise_df['status']=="Confirmed"]
+            statewise_confirmed_df.drop('status',axis=1,inplace=True)
+            statewise_confirmed_df.reset_index(inplace=True)
+            dates = statewise_confirmed_df['date']
+            statewise_confirmed_df.drop('date',axis=1,inplace=True)
+
+            for col in statewise_confirmed_df.columns:
+                statewise_confirmed_df[col] = statewise_confirmed_df[col].apply(get_count_state)
+            statwise_cummulative_df = statewise_confirmed_df
+            for i in range(1,len(statewise_confirmed_df)):
+                statwise_cummulative_df.iloc[i]=statwise_cummulative_df.iloc[i]+statwise_cummulative_df.iloc[i-1]
+            statwise_cummulative_df.drop('index',axis=1,inplace=True)
+            
+            statenames.set_index(['statecode'],inplace=True)
+            statenames = statenames.to_dict()['state']
+            statwise_cummulative_df.rename(columns=statenames,inplace=True)
+            dates = [datetime.strptime(x,'%d-%b-%y') for x in dates]
+            dates = [x.strftime("%b %d") for x in dates]
+            statwise_cummulative_df['date'] = dates
+
+            statewise_daily = {}
+
+            for col in statwise_cummulative_df.columns:
+                statewise_daily[col] = statwise_cummulative_df[col].tolist()
+            
+            cached_data = statewise_daily
+            save_cache(cache_key, cached_data)
+        except Exception as e:
+            cached_data = get_cache(cache_key)
+    return JsonResponse(cached_data)
 
 #route functions
 def adarsh(req):
@@ -97,12 +146,8 @@ def adarsh(req):
             'recovered' : int(present_data['recovered'].sum())
         }
 
-
         statewise_dataframe = statewise_dataframe[1:]
         statewise_dataframe = statewise_dataframe[statewise_dataframe['confirmed']!='0']
-
-
-        
 
         statewise = {
             'state' : statewise_dataframe['state'].tolist(),
@@ -718,38 +763,10 @@ def get_data_from_covid19org():
         'perMillion': format_as_indian(totaltests//1300)
     }
 
-    ### Statewise timeline
-    state_daily_url = "https://api.covid19india.org/states_daily.json"
-    statewise_timeline = requests.get(state_daily_url).json()
-    statewise_df = pd.DataFrame(statewise_timeline['states_daily'])
-    statewise_confirmed_df = statewise_df[statewise_df['status']=="Confirmed"]
-    statewise_confirmed_df.drop('status',axis=1,inplace=True)
-    statewise_confirmed_df.reset_index(inplace=True)
-    dates = statewise_confirmed_df['date']
-    statewise_confirmed_df.drop('date',axis=1,inplace=True)
 
-    for col in statewise_confirmed_df.columns:
-        statewise_confirmed_df[col] = statewise_confirmed_df[col].apply(get_count_state)
-    statwise_cummulative_df = statewise_confirmed_df
-    for i in range(1,len(statewise_confirmed_df)):
-        statwise_cummulative_df.iloc[i]=statwise_cummulative_df.iloc[i]+statwise_cummulative_df.iloc[i-1]
-    statwise_cummulative_df.drop('index',axis=1,inplace=True)
-    
-    statenames.set_index(['statecode'],inplace=True)
-    statenames = statenames.to_dict()['state']
-    statwise_cummulative_df.rename(columns=statenames,inplace=True)
-    dates = [datetime.strptime(x,'%d-%b-%y') for x in dates]
-    dates = [x.strftime("%b %d") for x in dates]
-    statwise_cummulative_df['date'] = dates
-
-    statewise_daily = {}
-
-    for col in statwise_cummulative_df.columns:
-        statewise_daily[col] = statwise_cummulative_df[col].tolist()
 
     return {
         'statewise': statewise,
-        'statewise_daily' : statewise_daily,
         'info': info,
         'days': days,
         'tests': tests,
