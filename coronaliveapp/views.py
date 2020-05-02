@@ -532,13 +532,27 @@ def get_state_data(state_name):
     }
 
     tests = None
+    ## Zones
+    r = requests.get('https://api.covid19india.org/zones.json')
+    r = r.json()['zones']
+    df = pd.DataFrame(r)
+    state_df = df[df['state']=='Karnataka']
+    green = state_df['district'][state_df['zone']=='Green']
+    orange = state_df['district'][state_df['zone']=='Orange']
+    red = state_df['district'][state_df['zone']=='Red']
+    zones = {
+        "red" : red.tolist(),
+        "green" : green.tolist(),
+        "orange" : orange.tolist()
+    }
 
     data = {
         'statewise': statewise,
         'info': info,
         'days': days,
         'tests': tests,
-        'type' : state_name
+        'type' : state_name,
+        'zone' : zones
     }
 
     return data

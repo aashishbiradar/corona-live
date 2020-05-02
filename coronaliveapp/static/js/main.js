@@ -383,10 +383,84 @@ if(data.type == 'India')
 {
     mapFunction()
 }
+
+//State map
+function plotStateMap(geojson)
+{
+    var red = [];
+    var orange = [];
+    var green = [];
+    for(i in geojson.features)
+    {
+        var dt_nm = geojson.features[i].properties.district;
+        var dt_in = data.statewise.state.indexOf(dt_nm);
+        var dt_cases =  data.statewise.confirmed[dt_in] || 0;
+        if (data.zone.red.indexOf(dt_nm) != -1) {
+            red.push([dt_nm, dt_cases]);
+        } else if(data.zone.orange.indexOf(dt_nm) != -1) {
+            orange.push([dt_nm, dt_cases]);
+        } else {
+            green.push([dt_nm, dt_cases]);
+        }
+    }
+
+    var series = [{
+        data: orange,
+        name : 'Orange Zone',
+        color: 'orange'
+    },{
+        data: green,
+        keys: ['district', 'value'],
+        name : 'Green Zone',
+        color: 'green'
+    },{
+        data: red,
+        keys: ['district', 'value'],
+        name : 'Red Zone',
+        color: 'red'
+    }];
+
+    Highcharts.mapChart('container', {
+        chart: {
+            map: geojson,
+        },
+        title: {
+            text: ''
+        },
+        plotOptions: {
+            map: {
+                allAreas: false,
+                keys: ['district', 'value'],
+                joinBy: 'district',
+                states: {
+                    hover: {
+                        color: 'black'
+                    }
+                },
+                dataLabels: {
+                    enabled: false,
+                },
+            }
+        },
+        mapNavigation: {
+            enabled: false,
+        },
+        tooltip: {
+            //headerFormat: '<span style="font-size:10px">Confirmed</span><br/>',
+            pointFormat: '{point.district}: <b>{point.value}</b> cases',
+        },
+        series: series,
+    });
+}
+
+if(data.type=="Karnataka")
+{
+    loadJson('/static/maps/karnataka.json',function(geojson){
+        plotStateMap(geojson);
+        //zone_map(geojson);
+    });
+}
 // state timeline
-
-  
-
 function plotStatewiseTimeline(timelineData)
 {
     var states = [];
