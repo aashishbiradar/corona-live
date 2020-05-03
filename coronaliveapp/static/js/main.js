@@ -302,85 +302,75 @@ d.querySelectorAll('.state-table tr').forEach(function(tr) {
 
 /* Map function */
 
-function mapFunction()
+function mapFunction(geojson)
 {
     var mapdata = [];
-    mapdata.push(['sikkim',0]);
-    var jkIndex = 0;
-    var ldkIndex = 0;
-    for(i=0;i<data.statewise.state.length;i++)
+    for(i in geojson.features)
     {
-        if (data.statewise.state[i].toLowerCase() == "jammu and kashmir")
-        {
-            jkIndex = i;
-        }
-        else if(data.statewise.state[i].toLowerCase() == "ladakh")
-        {
-            ldkIndex = i;
-        }
-        else
-        {
-            mapdata.push([data.statewise.state[i].toLowerCase(),data.statewise.confirmed[i]]);
-        }
+        var dt_nm = geojson.features[i].properties.st_nm;
+        var dt_in = data.statewise.state.indexOf(dt_nm);
+        mapdata.push([dt_nm,data.statewise.confirmed[dt_in] || 0])
     }
+    var series = [{
+        data: mapdata,
+        name : 'Confirmed',
+    }]
 
-    
-
-    mapdata.push(["jammu and kashmir",data.statewise.confirmed[ldkIndex]+data.statewise.confirmed[jkIndex]]);
-    // Create the chart
     Highcharts.mapChart('india-map', {
         chart: {
-            map: 'countries/in/custom/in-all-disputed'
+            map: geojson,
         },
-    
         title: {
             text: ''
         },
-    
-        subtitle: {
-            text: ''
+        plotOptions: {
+            map: {
+                allAreas: false,
+                keys: ['st_nm', 'value'],
+                joinBy: 'st_nm',
+                states: {
+                    hover: {
+                        color: 'black'
+                    }
+                },
+                dataLabels: {
+                    enabled: false,
+                },
+            }
         },
-    
+        colorAxis: {
+            min: 0,
+            max: data.statewise.confirmed[0],
+            minColor: '#FFFFFF',
+            maxColor: '#08306b',
+            lineColor: 'white',
+            lineWidth: 10,
+        },
+        legend: {
+            enabled: false,
+        },
         mapNavigation: {
             enabled: false,
-            buttonOptions: {
-                verticalAlign: 'bottom'
-            }
         },
-    
-        colorAxis: {
-                min: 0,
-                max: data.statewise.confirmed[0],
-                minColor: '#FFFFFF',
-                maxColor: '#08306b',
-                lineColor: 'white',
-                lineWidth: 10,
-            },
-        legend: {
-            layout: 'horizontal',
-            align: 'center',
+        tooltip: {
+            //headerFormat: '<span style="font-size:10px">Confirmed</span><br/>',
+            pointFormat: '{point.st_nm}: <b>{point.value}</b> cases',
         },
-    
-        series: [{
-            data: mapdata,
-            name: 'Confirmed',
-            states: {
-                hover: {
-                    color: 'black'
-                }
-            },
-            dataLabels: {
-                enabled: false,
-                format: '{point.name}'
-            }
-        }]
-    });    
+        series: series,
+    });
 }
 
+    
 
-if(data.type == 'India')
+
+
+
+if(data.type == "India")
 {
-    mapFunction()
+    var statekey = data.type.toLowerCase().replace(/ /g,"")
+    loadJson('/static/maps/'+statekey+'.json',function(geojson){
+        mapFunction(geojson);
+    });
 }
 
 //State map
@@ -419,7 +409,7 @@ function plotStateMap(geojson)
         color: 'red'
     }];
 
-    Highcharts.mapChart('statemap', {
+   Highcharts.mapChart('statemap', {
         chart: {
             map: geojson,
         },
@@ -540,4 +530,41 @@ function plotStatewiseTimeline(timelineData)
 window.innerWidth > 700 
 && data.type == "India" 
 && loadJson('/statewise-timeline/', function(d){plotStatewiseTimeline(d);});
+
+// load twitter timeline on scroll
+var twitterLoaded = false;
+
+var getDocHeight = function() {
+    return Math.max(
+        d.body.scrollHeight, d.documentElement.scrollHeight,
+        d.body.offsetHeight, d.documentElement.offsetHeight,
+        d.body.clientHeight, d.documentElement.clientHeight
+    )
+}
+
+var amountscrolled = function (){
+    var winheight= window.innerHeight || (document.documentElement || document.body).clientHeight
+    var docheight = getDocHeight()
+    var scrollTop = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop
+    var trackLength = docheight - winheight
+    var pctScrolled = Math.floor(scrollTop/trackLength * 100) // gets percentage scrolled (ie: 80 or NaN if tracklength == 0)
+    return pctScrolled;
+}
+
+window.addEventListener("scroll", function(){
+    var scrl = amountscrolled();
+    if(!twitterLoaded && scrl > 50) {
+        var twitterBox = d.getElementsByClassName('twitter-box')[0];
+        twitterBox.innerHTML =
+        ('<a class="twitter-timeline" data-width="500px" href="https://twitter.com/coronaindia_ml?ref_src=twsrc%5Etfw">Tweets by coronaindia_ml</a>');
+        var s = d.createElement("script");
+        s.charset = 'utf-8';
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://platform.twitter.com/widgets.js";
+        d.body.appendChild(s);
+        s.onload = function () { twitterBox.style.display = 'block'; };
+        twitterLoaded = true;
+    }
+}, false)
 
