@@ -315,7 +315,7 @@ function mapFunction(geojson)
         data: mapdata,
         name : 'Confirmed',
     }]
-
+    console.log(series)
     Highcharts.mapChart('india-map', {
         chart: {
             map: geojson,
@@ -530,41 +530,3 @@ function plotStatewiseTimeline(timelineData)
 window.innerWidth > 700 
 && data.type == "India" 
 && loadJson('/statewise-timeline/', function(d){plotStatewiseTimeline(d);});
-
-// load twitter timeline on scroll
-var twitterLoaded = false;
-
-var getDocHeight = function() {
-    return Math.max(
-        d.body.scrollHeight, d.documentElement.scrollHeight,
-        d.body.offsetHeight, d.documentElement.offsetHeight,
-        d.body.clientHeight, d.documentElement.clientHeight
-    )
-}
-
-var amountscrolled = function (){
-    var winheight= window.innerHeight || (document.documentElement || document.body).clientHeight
-    var docheight = getDocHeight()
-    var scrollTop = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop
-    var trackLength = docheight - winheight
-    var pctScrolled = Math.floor(scrollTop/trackLength * 100) // gets percentage scrolled (ie: 80 or NaN if tracklength == 0)
-    return pctScrolled;
-}
-
-window.addEventListener("scroll", function(){
-    var scrl = amountscrolled();
-    if(!twitterLoaded && scrl > 50) {
-        var twitterBox = d.getElementsByClassName('twitter-box')[0];
-        twitterBox.innerHTML =
-        ('<a class="twitter-timeline" data-width="500px" href="https://twitter.com/coronaindia_ml?ref_src=twsrc%5Etfw">Tweets by coronaindia_ml</a>');
-        var s = d.createElement("script");
-        s.charset = 'utf-8';
-        s.type = "text/javascript";
-        s.async = true;
-        s.src = "https://platform.twitter.com/widgets.js";
-        d.body.appendChild(s);
-        s.onload = function () { twitterBox.style.display = 'block'; };
-        twitterLoaded = true;
-    }
-}, false)
-
