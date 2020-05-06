@@ -1,0 +1,40 @@
+<table id="statewise-table">
+    <thead>
+        <tr>
+            <th>State</th>
+            <th>Confirmed</th>
+            <th>Active</th>
+            <th>Recovered</th>
+            <th>Death</th>
+        </tr>
+    </thead>
+    <tbody id="statewise-tbody">
+        {% for state in states %}
+            <tr>
+                {% if type == 'India' %} 
+                <td><a href="{{state.urlkey}}-coronavirus-updates">{{state.name}}</a></td>
+                {% else %}
+                <td>{{state.name}}</td>
+                {% endif %}
+                <td data-sort="{{state.confirmed}}">{{state.confirmed}}
+                    {% if state.deltaconfirmed > 0 %} 
+                    <span class="deltaconfirmed">{{state.deltaconfirmed}} &#8593;</span>
+                    {% endif %}
+                </td >
+                <td>{{state.active}}</td>
+                
+                <td data-sort="{{state.discharged}}">{{state.discharged}}
+                {% if state.deltarecovered > 0 %} 
+                <span class="deltarecovered">{{state.deltarecovered}} &#8593;</span>
+                {% endif %}
+                </td>
+                
+                <td data-sort="{{state.death}}">{{state.death}}
+                {% if state.deltadeaths > 0 %}
+                <span class="deltadeath">{{state.deltadeaths}} &#8593;</span>
+                {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
