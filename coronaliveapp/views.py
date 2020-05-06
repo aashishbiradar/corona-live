@@ -215,7 +215,12 @@ def stateupdate(req):
         states.append({
             'name': data['statewise']['state'][i],
             'confirmed': data['statewise']['confirmed'][i],
-            'deltaconfirmed' : data['statewise']['deltaconfirmed'][i]
+            'active': data['statewise']['active'][i],
+            'recovered': data['statewise']['recovered'][i],
+            'death': data['statewise']['death'][i],
+            'deltaconfirmed' : data['statewise']['deltaconfirmed'][i],
+            'deltarecovered' : data['statewise']['deltarecovered'][i],
+            'deltadeath' : data['statewise']['deltadeath'][i]
         })
 
     t2 = time.time()
@@ -515,19 +520,33 @@ def get_state_data(state_name):
 
     districts = []
     confirmed = []
+    recovered = []
+    death = []
     deltaconfirmed = []
+    deltarecovered = []
+    deltadeath = []
 
     for district in state['districtData']:
         districts.append(district)
         confirmed.append(state['districtData'][district]['confirmed'])
+        recovered.append(state['districtData'][district]['recovered'])
+        death.append(state['districtData'][district]['deceased'])
         deltaconfirmed.append(state['districtData'][district]['delta']['confirmed'])
+        deltarecovered.append(state['districtData'][district]['delta']['recovered'])
+        deltadeath.append(state['districtData'][district]['delta']['deceased'])
+        
 
-    data=pd.DataFrame(zip(districts,confirmed,deltaconfirmed),columns=['state','confirmed','deltaconfirmed'])
+    data=pd.DataFrame(zip(districts,confirmed,recovered, death,deltaconfirmed,deltarecovered,deltadeath),columns=['state','confirmed','recovered','death','deltaconfirmed','deltarecovered','deltadeath'])
     data.sort_values(by=['confirmed'],axis=0,inplace=True,ascending=False)
-
+    data['active'] = data['confirmed']-data['death']-data['recovered']
     statewise = {
         'state' : data['state'].tolist(),
         'confirmed' : data['confirmed'].tolist(),
+        'recovered' : data['recovered'].tolist(),
+        'active' : data['active'].tolist(),
+        'death' : data['death'].tolist(),
+        'deltadeath' : data['deltadeath'].tolist(),
+        'deltarecovered' : data['deltarecovered'].tolist(),
         'deltaconfirmed' : data['deltaconfirmed'].tolist()
     }
 

@@ -25,6 +25,9 @@
                         <tr>
                          <th>District</th>
                          <th>Confirmed</th>
+                         <th>Active</th>
+                         <th>Recovered</th>
+                         <th>Death</th>
                        </tr>
                     </thead>
                     <tbody id='statewise-tbody'>
@@ -38,6 +41,17 @@
                                 <td data-sort="{{state.confirmed}}">{{state.confirmed}} 
                                     {% if state.deltaconfirmed > 0 %} 
                                     <span class="deltaconfirmed">{{state.deltaconfirmed}} &#8593;</span>
+                                    {% endif %}
+                                </td >
+                                <td data-sort="{{state.active}}">{{state.active}}</td >
+                                <td data-sort="{{state.recovered}}">{{state.recovered}} 
+                                    {% if state.deltarecovered > 0 %} 
+                                    <span class="deltarecovered">{{state.deltarecovered}} &#8593;</span>
+                                    {% endif %}
+                                </td >
+                                <td data-sort="{{state.death}}">{{state.death}} 
+                                    {% if state.deltadeath > 0 %} 
+                                    <span class="deltadeath">{{state.deltadeath}} &#8593;</span>
                                     {% endif %}
                                 </td >
                            </tr>
