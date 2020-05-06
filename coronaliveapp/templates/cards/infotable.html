@@ -21,8 +21,11 @@
                     <span class="deltaconfirmed">{{state.deltaconfirmed}} &#8593;</span>
                     {% endif %}
                 </td >
+                {% if state.active > -1%}
                 <td>{{state.active}}</td>
-                
+                {% else %}
+                <td>0</td>
+                {% endif %}
                 <td data-sort="{{state.discharged}}">{{state.discharged}}
                 {% if state.deltarecovered > 0 %} 
                 <span class="deltarecovered">{{state.deltarecovered}} &#8593;</span>
