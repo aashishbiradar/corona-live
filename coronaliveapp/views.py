@@ -216,11 +216,11 @@ def stateupdate(req):
             'name': data['statewise']['state'][i],
             'confirmed': data['statewise']['confirmed'][i],
             'active': data['statewise']['active'][i],
-            'recovered': data['statewise']['recovered'][i],
+            'discharged': data['statewise']['recovered'][i],
             'death': data['statewise']['death'][i],
             'deltaconfirmed' : data['statewise']['deltaconfirmed'][i],
             'deltarecovered' : data['statewise']['deltarecovered'][i],
-            'deltadeath' : data['statewise']['deltadeath'][i]
+            'deltadeaths' : data['statewise']['deltadeath'][i]
         })
 
     t2 = time.time()
